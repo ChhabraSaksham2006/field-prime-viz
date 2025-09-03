@@ -8,6 +8,9 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import Dashboard from "./pages/Dashboard";
 import ImageUpload from "./pages/ImageUpload";
+import HealthMap from "./pages/HealthMap";
+import TerrainVisualization from "./pages/TerrainVisualization";
+import SpectralAnalysis from "./pages/SpectralAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,9 +31,9 @@ const App = () => (
                   <Route path="/" element={<Dashboard />} />
                   {/* Placeholder routes for other pages */}
                   <Route path="/upload" element={<ImageUpload />} />
-                  <Route path="/health-map" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">Health Map Coming Soon</h1></div>} />
-                  <Route path="/terrain" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">3D Terrain Coming Soon</h1></div>} />
-                  <Route path="/spectral" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">Spectral Analysis Coming Soon</h1></div>} />
+                  <Route path="/health-map" element={<HealthMap />} />
+                  <Route path="/terrain" element={<TerrainVisualization />} />
+                  <Route path="/spectral" element={<SpectralAnalysis />} />
                   <Route path="/fields" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">Field Management Coming Soon</h1></div>} />
                   <Route path="/team" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">Team Management Coming Soon</h1></div>} />
                   <Route path="/data" element={<div className="text-center py-20"><h1 className="text-2xl font-bold text-gradient-primary">Data Sources Coming Soon</h1></div>} />
