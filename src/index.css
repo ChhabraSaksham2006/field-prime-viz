@@ -2,41 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Agricultural Technology Design System - Smart India Hackathon 2025 
+All colors MUST be HSL for proper theming.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Agricultural Technology Color Palette */
+    --background: 210 20% 98%;
+    --foreground: 160 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 160 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 160 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Agricultural Green Primary */
+    --primary: 142 70% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 70% 30%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Earth Tone Secondary */
+    --secondary: 35 25% 92%;
+    --secondary-foreground: 35 40% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Technology Blue Accent */
+    --accent: 210 100% 95%;
+    --accent-foreground: 210 100% 25%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 88%;
+    --input: 210 20% 94%;
+    --ring: 142 70% 35%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Agricultural Technology Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 70% 35%), hsl(120 60% 45%));
+    --gradient-earth: linear-gradient(180deg, hsl(35 40% 85%), hsl(25 30% 75%));
+    --gradient-sky: linear-gradient(180deg, hsl(210 80% 88%), hsl(200 70% 92%));
+    --gradient-health: linear-gradient(90deg, hsl(0 70% 50%), hsl(30 80% 55%), hsl(60 80% 60%), hsl(120 70% 50%));
+
+    /* Agricultural Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(142 70% 35% / 0.1);
+    --shadow-medium: 0 4px 16px -4px hsl(142 70% 35% / 0.15);
+    --shadow-strong: 0 8px 32px -8px hsl(142 70% 35% / 0.2);
+    --shadow-glow: 0 0 24px hsl(142 70% 35% / 0.3);
+
+    /* Professional Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Agricultural Metrics Colors */
+    --health-excellent: 120 70% 50%;
+    --health-good: 90 60% 55%;
+    --health-moderate: 60 80% 60%;
+    --health-poor: 30 80% 55%;
+    --health-critical: 0 70% 50%;
+
+    /* Technology Blues */
+    --tech-primary: 210 100% 50%;
+    --tech-secondary: 220 80% 60%;
+    --tech-accent: 200 70% 70%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +89,46 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Agricultural Technology Theme */
+    --background: 160 15% 8%;
+    --foreground: 210 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 160 15% 10%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 160 15% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 142 60% 55%;
+    --primary-foreground: 160 15% 8%;
+    --primary-hover: 142 60% 60%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 160 15% 15%;
+    --secondary-foreground: 210 20% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 160 15% 15%;
+    --muted-foreground: 215 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 210 80% 15%;
+    --accent-foreground: 210 80% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 160 15% 20%;
+    --input: 160 15% 15%;
+    --ring: 142 60% 55%;
+
+    /* Dark Mode Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 60% 45%), hsl(120 50% 55%));
+    --gradient-earth: linear-gradient(180deg, hsl(35 30% 15%), hsl(25 20% 12%));
+    --gradient-sky: linear-gradient(180deg, hsl(210 40% 12%), hsl(200 30% 15%));
+
+    /* Dark Agricultural Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 4px 16px -4px hsl(0 0% 0% / 0.4);
+    --shadow-strong: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 24px hsl(142 60% 55% / 0.4);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +146,64 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+
+  /* Agricultural Technology Typography */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-green-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-health {
+    background: var(--gradient-health);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer components {
+  /* Agricultural Metric Cards */
+  .metric-card {
+    @apply bg-card/50 backdrop-blur-sm border border-border/60 rounded-xl p-6;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+  }
+
+  .metric-card:hover {
+    @apply border-primary/30;
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Professional Buttons */
+  .btn-primary {
+    background: var(--gradient-primary);
+    @apply text-white border-0 shadow-lg;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+  }
+
+  .btn-primary:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Data Visualization Containers */
+  .viz-container {
+    @apply bg-card/70 backdrop-blur border border-border/40 rounded-2xl p-6;
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Interactive Elements */
+  .interactive-element {
+    @apply cursor-pointer transition-all duration-300 hover:scale-102;
+    transition: var(--transition-bounce);
+  }
+
+  /* Agricultural Status Indicators */
+  .status-excellent { @apply bg-green-500/20 text-green-700 border-green-300; }
+  .status-good { @apply bg-lime-500/20 text-lime-700 border-lime-300; }
+  .status-moderate { @apply bg-yellow-500/20 text-yellow-700 border-yellow-300; }
+  .status-poor { @apply bg-orange-500/20 text-orange-700 border-orange-300; }
+  .status-critical { @apply bg-red-500/20 text-red-700 border-red-300; }
 }
