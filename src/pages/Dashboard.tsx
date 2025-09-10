@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
 import { 
   Leaf, 
   Droplets, 
@@ -9,6 +10,19 @@ import {
   AlertTriangle,
   CheckCircle
 } from "lucide-react"
+// TODO: Create and implement socket hooks
+// Temporary mock implementation until socket hooks are created
+const useIoTData = () => ({
+  data: null,
+  isConnected: false
+});
+
+const useInitialData = () => ({
+  data: null
+});
+
+export { useIoTData, useInitialData };
+import { useApiData } from "@/hooks/use-api"
 import { MetricCard } from "@/components/dashboard/MetricCard"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -30,8 +44,87 @@ import {
 } from 'recharts'
 
 const Dashboard = () => {
-  // Mock data for the charts
-  const healthData = [
+  // Use socket hooks for real-time data
+  const { data: realtimeData, isConnected } = useIoTData();
+  const { data: initialData } = useInitialData();
+  
+  // Use API hook for HTTP data
+  const { data: apiData, isLoading: isApiLoading, error: apiError } = useApiData();
+  
+  // State to store the combined data
+  const [iotData, setIotData] = useState<any[]>([]);
+  const [healthData, setHealthData] = useState<any[]>([]);
+  
+  // Log API data when it's loaded
+  useEffect(() => {
+    if (apiData) {
+      console.log('API data loaded:', apiData);
+    }
+    if (apiError) {
+      console.error('API error:', apiError);
+    }
+  }, [apiData, apiError]);
+  
+  // Update the data when real-time updates are received
+  useEffect(() => {
+    if (realtimeData && realtimeData.iot_data && realtimeData.iot_data.length > 0) {
+      setIotData(realtimeData.iot_data);
+      
+      // Transform IoT data for the health chart
+      const transformedData = realtimeData.iot_data.slice(-6).map((item: any, index: number) => {
+        const date = new Date(item.timestamp);
+        return {
+          name: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          health: Math.round(85 + (item.soil_moisture_pct - 70) / 2),
+          yield: Math.round(120 + item.temperature_c)
+        };
+      });
+      
+      setHealthData(transformedData);
+    }
+  }, [realtimeData]);
+  
+  // Use initial data if available and no real-time data yet
+  useEffect(() => {
+    if (initialData && initialData.iot_data && initialData.iot_data.length > 0 && iotData.length === 0) {
+      setIotData(initialData.iot_data);
+      
+      // Transform IoT data for the health chart
+      const transformedData = initialData.iot_data.slice(-6).map((item: any, index: number) => {
+        const date = new Date(item.timestamp);
+        return {
+          name: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          health: Math.round(85 + (item.soil_moisture_pct - 70) / 2),
+          yield: Math.round(120 + item.temperature_c)
+        };
+      });
+      
+      setHealthData(transformedData);
+    }
+  }, [initialData, iotData.length]);
+  
+  // Use API data if available and no socket data yet
+  useEffect(() => {
+    if (apiData && apiData.iot_data && apiData.iot_data.length > 0 && iotData.length === 0) {
+      console.log('Using API data for dashboard');
+      setIotData(apiData.iot_data);
+      
+      // Transform IoT data for the health chart
+      const transformedData = apiData.iot_data.slice(-6).map((item: any, index: number) => {
+        const date = new Date(item.timestamp);
+        return {
+          name: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          health: Math.round(85 + (item.soil_moisture_pct - 70) / 2),
+          yield: Math.round(120 + item.temperature_c)
+        };
+      });
+      
+      setHealthData(transformedData);
+    }
+  }, [apiData, iotData.length]);
+  
+  // Fallback mock data for the charts if no real data is available
+  const fallbackHealthData = [
     { name: 'Jan', health: 85, yield: 120 },
     { name: 'Feb', health: 88, yield: 125 },
     { name: 'Mar', health: 92, yield: 135 },
@@ -40,14 +133,62 @@ const Dashboard = () => {
     { name: 'Jun', health: 91, yield: 140 },
   ]
 
-  const cropDistribution = [
+  // Use the latest IoT data for the metrics or fallback to mock data
+  const latestIoTData = iotData.length > 0 ? iotData[iotData.length - 1] : null;
+  
+  // Calculate crop distribution based on IoT data or use fallback
+  const cropDistribution = latestIoTData ? [
+    { 
+      name: 'Healthy', 
+      value: Math.round(60 + (latestIoTData.soil_moisture_pct / 100) * 20), 
+      color: 'hsl(var(--health-excellent))' 
+    },
+    { 
+      name: 'Good', 
+      value: Math.round(15 + (latestIoTData.humidity_pct / 100) * 5), 
+      color: 'hsl(var(--health-good))' 
+    },
+    { 
+      name: 'Moderate', 
+      value: Math.round(5 + (100 - latestIoTData.soil_moisture_pct) / 20), 
+      color: 'hsl(var(--health-moderate))' 
+    },
+    { 
+      name: 'Critical', 
+      value: Math.max(2, Math.round((latestIoTData.temperature_c - 25) / 5)), 
+      color: 'hsl(var(--health-critical))' 
+    },
+  ] : [
     { name: 'Healthy', value: 78, color: 'hsl(var(--health-excellent))' },
     { name: 'Good', value: 15, color: 'hsl(var(--health-good))' },
     { name: 'Moderate', value: 5, color: 'hsl(var(--health-moderate))' },
     { name: 'Critical', value: 2, color: 'hsl(var(--health-critical))' },
-  ]
+  ];
 
-  const alerts = [
+  // Generate alerts based on IoT data or use fallback
+  const alerts = latestIoTData ? [
+    { 
+      id: 1, 
+      type: latestIoTData.soil_moisture_pct < 60 ? 'warning' : 'info', 
+      field: 'North Field A', 
+      message: latestIoTData.soil_moisture_pct < 60 ? 'Moisture levels below optimal' : 'Moisture levels normal', 
+      time: '2 hours ago' 
+    },
+    { 
+      id: 2, 
+      type: latestIoTData.temperature_c > 30 ? 'warning' : 'success', 
+      field: 'South Field C', 
+      message: latestIoTData.temperature_c > 30 ? 'Temperature above optimal range' : 'Harvest ready - optimal conditions', 
+      time: '4 hours ago' 
+    },
+    { 
+      id: 3, 
+      type: 'info', 
+      field: 'East Field B', 
+      message: 'Spectral analysis complete', 
+      time: '6 hours ago' 
+    },
+  ] : [
     { id: 1, type: 'warning', field: 'North Field A', message: 'Moisture levels below optimal', time: '2 hours ago' },
     { id: 2, type: 'success', field: 'South Field C', message: 'Harvest ready - optimal conditions', time: '4 hours ago' },
     { id: 3, type: 'info', field: 'East Field B', message: 'Spectral analysis complete', time: '6 hours ago' },
@@ -92,8 +233,12 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <MetricCard
           title="Crop Health Index"
-          value="94.2%"
-          change={{ value: 5.2, type: 'increase', period: 'last week' }}
+          value={latestIoTData ? `${Math.round(85 + (latestIoTData.soil_moisture_pct - 70) / 2)}%` : "94.2%"}
+          change={{ 
+            value: latestIoTData ? Number((latestIoTData.soil_moisture_pct / 100 * 10).toFixed(1)) : 5.2, 
+            type: latestIoTData && latestIoTData.soil_moisture_pct > 70 ? 'increase' : 'decrease', 
+            period: 'last update' 
+          }}
           icon={Leaf}
           iconColor="bg-health-excellent"
           trend={[65, 72, 78, 85, 88, 92, 94]}
@@ -104,11 +249,15 @@ const Dashboard = () => {
         />
         <MetricCard
           title="Soil Moisture"
-          value="68%"
-          change={{ value: 2.1, type: 'decrease', period: 'last week' }}
+          value={latestIoTData ? `${latestIoTData.soil_moisture_pct.toFixed(1)}%` : "68%"}
+          change={{ 
+            value: latestIoTData ? Number((latestIoTData.soil_moisture_pct - 70).toFixed(1)) : 2.1, 
+            type: latestIoTData && latestIoTData.soil_moisture_pct > 70 ? 'increase' : 'decrease', 
+            period: 'last update' 
+          }}
           icon={Droplets}
           iconColor="bg-tech-primary"
-          trend={[70, 69, 71, 68, 65, 67, 68]}
+          trend={iotData.length > 6 ? iotData.slice(-7).map(d => d.soil_moisture_pct) : [70, 69, 71, 68, 65, 67, 68]}
           delay={0.2}
           status="warning"
           description="Average across all fields"
@@ -116,26 +265,34 @@ const Dashboard = () => {
         />
         <MetricCard
           title="Temperature"
-          value="24.5°C"
-          change={{ value: 1.8, type: 'increase', period: 'yesterday' }}
+          value={latestIoTData ? `${latestIoTData.temperature_c.toFixed(1)}°C` : "24.5°C"}
+          change={{ 
+            value: latestIoTData ? Number((latestIoTData.temperature_c - 24).toFixed(1)) : 1.8, 
+            type: latestIoTData && latestIoTData.temperature_c < 24 ? 'decrease' : 'increase', 
+            period: 'last update' 
+          }}
           icon={Thermometer}
           iconColor="bg-health-moderate"
-          trend={[22, 23, 24, 25, 24, 23, 25]}
+          trend={iotData.length > 6 ? iotData.slice(-7).map(d => d.temperature_c) : [22, 23, 24, 25, 24, 23, 25]}
           delay={0.3}
           description="Average ambient temperature"
           onClick={() => console.log('View temperature details')}
         />
         <MetricCard
-          title="UV Index"
-          value="7.2"
-          change={{ value: 0.5, type: 'increase', period: 'today' }}
+          title="Humidity"
+          value={latestIoTData ? `${latestIoTData.humidity_pct.toFixed(1)}%` : "65.8%"}
+          change={{ 
+            value: latestIoTData ? Number((latestIoTData.humidity_pct - 65).toFixed(1)) : 0.5, 
+            type: latestIoTData && latestIoTData.humidity_pct > 65 ? 'increase' : 'decrease', 
+            period: 'last update' 
+          }}
           icon={Sun}
           iconColor="bg-health-poor"
-          trend={[6, 6.5, 7, 7.5, 7.2, 7.1, 7.2]}
+          trend={iotData.length > 6 ? iotData.slice(-7).map(d => d.humidity_pct) : [60, 62, 63, 64, 65, 65, 66]}
           delay={0.4}
           status="critical"
-          description="Current UV radiation level"
-          onClick={() => console.log('View UV details')}
+          description="Current humidity level"
+          onClick={() => console.log('View humidity details')}
         />
       </div>
 

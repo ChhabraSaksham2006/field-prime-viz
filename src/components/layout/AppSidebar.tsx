@@ -36,7 +36,7 @@ import {
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: BarChart3,
     description: "Agricultural Analytics Overview"
   },
