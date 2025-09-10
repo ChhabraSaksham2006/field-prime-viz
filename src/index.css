@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Agricultural Technology Design System - Smart India Hackathon 2025 
 All colors MUST be HSL for proper theming.
@@ -142,16 +143,23 @@ All colors MUST be HSL for proper theming.
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Agricultural Technology Typography */
   .text-gradient-primary {
-    @apply bg-gradient-to-r from-primary to-green-500 bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, hsl(var(--primary)), #22c55e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .text-gradient-health {
@@ -165,45 +173,76 @@ All colors MUST be HSL for proper theming.
 @layer components {
   /* Agricultural Metric Cards */
   .metric-card {
-    @apply bg-card/50 backdrop-blur-sm border border-border/60 rounded-xl p-6;
+    background-color: hsla(var(--card) / 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid hsla(var(--border) / 0.6);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
     box-shadow: var(--shadow-soft);
     transition: var(--transition-smooth);
   }
 
   .metric-card:hover {
-    @apply border-primary/30;
+    border-color: hsla(var(--primary) / 0.3);
     box-shadow: var(--shadow-medium);
   }
 
   /* Professional Buttons */
   .btn-primary {
     background: var(--gradient-primary);
-    @apply text-white border-0 shadow-lg;
+    color: white;
+    border: 0;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     box-shadow: var(--shadow-soft);
     transition: var(--transition-smooth);
   }
 
   .btn-primary:hover {
-    @apply scale-105;
+    transform: scale(1.05);
     box-shadow: var(--shadow-glow);
   }
 
   /* Data Visualization Containers */
   .viz-container {
-    @apply bg-card/70 backdrop-blur border border-border/40 rounded-2xl p-6;
+    background-color: hsla(var(--card) / 0.7);
+    backdrop-filter: blur(4px);
+    border: 1px solid hsla(var(--border) / 0.4);
+    border-radius: 1rem;
+    padding: 1.5rem;
     box-shadow: var(--shadow-medium);
   }
 
   /* Interactive Elements */
   .interactive-element {
-    @apply cursor-pointer transition-all duration-300 hover:scale-102;
+    cursor: pointer;
+    transition: all 0.3s;
     transition: var(--transition-bounce);
   }
 
   /* Agricultural Status Indicators */
-  .status-excellent { @apply bg-green-500/20 text-green-700 border-green-300; }
-  .status-good { @apply bg-lime-500/20 text-lime-700 border-lime-300; }
-  .status-moderate { @apply bg-yellow-500/20 text-yellow-700 border-yellow-300; }
-  .status-poor { @apply bg-orange-500/20 text-orange-700 border-orange-300; }
-  .status-critical { @apply bg-red-500/20 text-red-700 border-red-300; }
+.status-excellent { 
+  background-color: rgba(34, 197, 94, 0.2);
+  color: rgb(21, 128, 61);
+  border-color: rgb(134, 239, 172);
+}
+.status-good {
+  background-color: rgba(132, 204, 22, 0.2);
+  color: rgb(63, 98, 18);
+  border-color: rgb(190, 242, 100);
+}
+.status-moderate {
+  background-color: rgba(234, 179, 8, 0.2);
+  color: rgb(161, 98, 7);
+  border-color: rgb(253, 224, 71);
+}
+.status-poor {
+  background-color: rgba(249, 115, 22, 0.2);
+  color: rgb(194, 65, 12);
+  border-color: rgb(253, 186, 116);
+}
+.status-critical {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(185, 28, 28);
+  border-color: rgb(252, 165, 165);
+}
 }

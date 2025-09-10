@@ -167,26 +167,26 @@ const SpectralAnalysis = () => {
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
       >
         <div>
-          <h1 className="text-4xl font-bold text-gradient-primary mb-2">Real-time Spectral Analysis</h1>
-          <p className="text-lg text-muted-foreground">Live hyperspectral signature monitoring and vegetation indices</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-primary mb-1 sm:mb-2">Real-time Spectral Analysis</h1>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Live hyperspectral signature monitoring and vegetation indices</p>
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex gap-2 mt-4 lg:mt-0"
+          className="flex gap-2 mt-3 lg:mt-0"
         >
           <Button
             variant="outline"
             onClick={() => setIsLiveMode(!isLiveMode)}
-            className={isLiveMode ? "bg-health-excellent/10 border-health-excellent/20" : ""}
+            className={`text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 ${isLiveMode ? "bg-health-excellent/10 border-health-excellent/20" : ""}`}
           >
-            {isLiveMode ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-            {isLiveMode ? "Pause" : "Start"} Live Mode
+            {isLiveMode ? <Pause className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" /> : <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />}
+            <span className="truncate">{isLiveMode ? "Pause" : "Start"} Live Mode</span>
           </Button>
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export Data
+          <Button variant="outline" className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+            <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+            <span className="truncate">Export Data</span>
           </Button>
         </motion.div>
       </motion.div>
@@ -196,7 +196,7 @@ const SpectralAnalysis = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-center gap-4 p-4 bg-card/50 rounded-lg border border-border/60"
+        className="flex flex-wrap items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-card/50 rounded-lg border border-border/60"
       >
         <div className="flex items-center gap-2">
           <div className={`w-3 h-3 rounded-full ${isLiveMode ? 'bg-health-excellent animate-pulse' : 'bg-muted'}`}></div>
@@ -220,32 +220,32 @@ const SpectralAnalysis = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
       >
         {Object.entries(indices).map(([key, value], index) => (
-          <Card key={key} className="metric-card">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-primary" />
+          <Card key={key} className="metric-card p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
-              <div>
-                <h3 className="font-medium text-sm uppercase tracking-wide">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-medium text-xs sm:text-sm uppercase tracking-wide truncate">
                   {key.toUpperCase()}
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground truncate">
                   {key === 'ndvi' ? 'Normalized Difference Vegetation Index' :
                    key === 'gndvi' ? 'Green NDVI' : 'Enhanced Vegetation Index'}
                 </p>
               </div>
             </div>
             <motion.div 
-              className={`text-2xl font-bold ${getHealthColor(value as number, key)}`}
+              className={`text-xl sm:text-2xl font-bold ${getHealthColor(value as number, key)}`}
               animate={{ scale: isLiveMode ? [1, 1.05, 1] : 1 }}
               transition={{ duration: 2, repeat: isLiveMode ? Infinity : 0 }}
             >
               {(value as number).toFixed(3)}
             </motion.div>
-            <div className="mt-2 h-2 bg-muted/30 rounded-full overflow-hidden">
+            <div className="mt-2 h-1.5 sm:h-2 bg-muted/30 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-primary"
                 initial={{ width: 0 }}
@@ -257,7 +257,7 @@ const SpectralAnalysis = () => {
         ))}
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
         {/* Main Spectral Chart */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -265,18 +265,18 @@ const SpectralAnalysis = () => {
           transition={{ delay: 0.3 }}
           className="xl:col-span-3"
         >
-          <Card className="viz-container">
-            <div className="flex items-center justify-between mb-6">
+          <Card className="viz-container p-3 sm:p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
               <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-semibold">Live Spectral Signature</h3>
+                <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <h3 className="text-lg sm:text-xl font-semibold truncate">Live Spectral Signature</h3>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className={isLiveMode ? "bg-health-excellent/10 text-health-excellent border-health-excellent/20" : "bg-muted/10"}>
                   {isLiveMode ? "Streaming" : "Offline"}
                 </Badge>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="w-4 h-4" />
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>

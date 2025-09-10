@@ -188,22 +188,29 @@ const TerrainVisualization = () => {
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
       >
         <div>
-          <h1 className="text-4xl font-bold text-gradient-primary mb-2">3D Terrain Visualization</h1>
-          <p className="text-lg text-muted-foreground">Interactive field topography and elevation analysis</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-primary mb-1 sm:mb-2">3D Terrain Visualization</h1>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Interactive field topography and elevation analysis</p>
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="flex gap-2 mt-4 lg:mt-0"
+          className="flex gap-2 mt-3 lg:mt-0"
         >
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export 3D Model
+          <Button 
+            variant="outline" 
+            className="text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+            aria-label="Export 3D terrain model"
+          >
+            <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">Export 3D Model</span>
           </Button>
-          <Button className="bg-gradient-primary">
-            <Eye className="w-4 h-4 mr-2" />
-            AR View
+          <Button 
+            className="bg-gradient-primary text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+            aria-label="View terrain in augmented reality"
+          >
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">AR View</span>
           </Button>
         </motion.div>
       </motion.div>
@@ -213,7 +220,7 @@ const TerrainVisualization = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4"
       >
         {stats.map((stat, index) => (
           <motion.div
@@ -222,14 +229,14 @@ const TerrainVisualization = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 + index * 0.1 }}
           >
-            <Card className="metric-card">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <stat.icon className="w-5 h-5 text-primary" />
+            <Card className="metric-card p-2 sm:p-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" aria-hidden="true" />
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="font-semibold">{stat.value}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate" id={`stat-label-${index}`}>{stat.label}</p>
+                  <p className="text-sm sm:text-base font-semibold truncate" aria-labelledby={`stat-label-${index}`}>{stat.value}</p>
                 </div>
               </div>
             </Card>
@@ -245,18 +252,23 @@ const TerrainVisualization = () => {
           transition={{ delay: 0.3 }}
           className="xl:col-span-3"
         >
-          <Card className="viz-container">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Mountain className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-semibold">Interactive 3D Terrain</h3>
+          <Card className="viz-container p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-3 sm:mb-6">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Mountain className="w-4 h-4 sm:w-5 sm:h-5 text-primary" aria-hidden="true" />
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold">Interactive 3D Terrain</h3>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-tech-primary/10 text-tech-primary border-tech-primary/20">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Badge variant="outline" className="bg-tech-primary/10 text-tech-primary border-tech-primary/20 text-xs sm:text-sm px-1 sm:px-2 h-5 sm:h-6">
                   WebGL Enabled
                 </Badge>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="w-4 h-4" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                  aria-label="Reset terrain view"
+                >
+                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -312,32 +324,37 @@ const TerrainVisualization = () => {
         >
           {/* Visualization Controls */}
           <Card className="viz-container">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Settings className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" id="viz-controls-heading">
+              <Settings className="w-5 h-5 text-primary" aria-hidden="true" />
               Visualization Controls
             </h3>
             
             <div className="space-y-4">
               {/* Height Scale */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">
+                <Label htmlFor="height-scale" className="text-sm font-medium mb-2 block">
                   Height Scale: {heightScale[0]}x
                 </Label>
                 <Slider
+                  id="height-scale"
                   value={heightScale}
                   onValueChange={setHeightScale}
                   max={3}
                   min={0.1}
                   step={0.1}
                   className="w-full"
+                  aria-label={`Height scale: ${heightScale[0]}x`}
+                  aria-valuemin={0.1}
+                  aria-valuemax={3}
+                  aria-valuenow={heightScale[0]}
                 />
               </div>
 
               {/* Color Mode */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">Color Mode</Label>
+                <Label htmlFor="color-mode" className="text-sm font-medium mb-2 block">Color Mode</Label>
                 <Select value={colorMode} onValueChange={setColorMode}>
-                  <SelectTrigger>
+                  <SelectTrigger aria-label={`Current color mode: ${colorMode}`}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -349,9 +366,9 @@ const TerrainVisualization = () => {
 
               {/* View Mode */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">View Mode</Label>
+                <Label htmlFor="view-mode" className="text-sm font-medium mb-2 block">View Mode</Label>
                 <Select value={viewMode} onValueChange={setViewMode}>
-                  <SelectTrigger>
+                  <SelectTrigger aria-label={`Current view mode: ${viewMode}`}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

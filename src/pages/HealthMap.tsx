@@ -1,6 +1,28 @@
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Map, Layers, ZoomIn, ZoomOut, RotateCcw, Download, Filter, Satellite } from "lucide-react"
+import { 
+  Map, 
+  Layers, 
+  ZoomIn, 
+  ZoomOut, 
+  RotateCcw, 
+  RotateCw,
+  Download, 
+  Filter, 
+  Satellite, 
+  Settings2, 
+  Plus, 
+  Minus, 
+  Tag, 
+  Activity, 
+  MapPin, 
+  ChevronRight, 
+  PieChart,
+  LineChart,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp
+} from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,22 +31,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Breadcrumbs } from "@/components/common/Breadcrumbs"
+import { Progress } from "@/components/ui/progress"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { FieldCard } from "@/components/dashboard/FieldCard"
 
 // Mock field data with health indices
 const fieldData = [
-  { id: 1, name: "North Field A", health: 92, area: "15.2 ha", coords: [0, 0], color: "#22c55e" },
-  { id: 2, name: "North Field B", health: 78, area: "18.7 ha", coords: [100, 50], color: "#84cc16" },
-  { id: 3, name: "South Field C", health: 65, area: "22.1 ha", coords: [200, 150], color: "#eab308" },
-  { id: 4, name: "East Field D", health: 45, area: "12.8 ha", coords: [300, 100], color: "#f97316" },
-  { id: 5, name: "West Field E", health: 38, area: "19.5 ha", coords: [50, 200], color: "#ef4444" },
+  { id: 1, name: "North Field A", health: 92, area: "15.2 ha", coords: [0, 0], color: "#22c55e", moisture: 78, temperature: 24, ndvi: 0.85, stress: "Low" },
+  { id: 2, name: "North Field B", health: 78, area: "18.7 ha", coords: [100, 50], color: "#84cc16", moisture: 65, temperature: 26, ndvi: 0.72, stress: "Low" },
+  { id: 3, name: "South Field C", health: 65, area: "22.1 ha", coords: [200, 150], color: "#eab308", moisture: 52, temperature: 28, ndvi: 0.61, stress: "Moderate" },
+  { id: 4, name: "East Field D", health: 45, area: "12.8 ha", coords: [300, 100], color: "#f97316", moisture: 38, temperature: 31, ndvi: 0.48, stress: "High" },
+  { id: 5, name: "West Field E", health: 38, area: "19.5 ha", coords: [50, 200], color: "#ef4444", moisture: 30, temperature: 33, ndvi: 0.41, stress: "Critical" },
 ]
 
 const HealthMap = () => {
   const [selectedField, setSelectedField] = useState<typeof fieldData[0] | null>(null)
-  const [zoomLevel, setZoomLevel] = useState([50])
   const [showLabels, setShowLabels] = useState(true)
   const [mapLayer, setMapLayer] = useState("satellite")
-  const [healthFilter, setHealthFilter] = useState([0, 100])
+  const [healthFilter, setHealthFilter] = useState(0)
+  const [zoom, setZoom] = useState(5)
+  const [rotation, setRotation] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   // Generate heatmap visualization
@@ -133,7 +159,7 @@ const HealthMap = () => {
       }
     })
 
-  }, [zoomLevel, showLabels, healthFilter])
+  }, [zoom, showLabels, healthFilter])
 
   const getHealthColor = (health: number) => {
     if (health >= 85) return 'text-health-excellent'
@@ -182,13 +208,13 @@ const HealthMap = () => {
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {/* Map Visualization */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="xl:col-span-3"
+          className="lg:col-span-2 xl:col-span-3"
         >
           <Card className="viz-container">
             <div className="flex items-center justify-between mb-6">
@@ -197,14 +223,29 @@ const HealthMap = () => {
                 <h3 className="text-xl font-semibold">Field Health Heatmap</h3>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <ZoomIn className="w-4 h-4" />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  aria-label="Zoom in"
+                  onClick={() => setZoom(prev => Math.min(prev + 10, 200))}
+                >
+                  <ZoomIn className="w-4 h-4" aria-hidden="true" />
                 </Button>
-                <Button variant="outline" size="sm">
-                  <ZoomOut className="w-4 h-4" />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  aria-label="Zoom out"
+                  onClick={() => setZoom(prev => Math.max(prev - 10, 10))}
+                >
+                  <ZoomOut className="w-4 h-4" aria-hidden="true" />
                 </Button>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="w-4 h-4" />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  aria-label="Rotate counterclockwise"
+                  onClick={() => setRotation(prev => prev - 15)}
+                >
+                  <RotateCcw className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -213,7 +254,7 @@ const HealthMap = () => {
             <div className="relative bg-muted/20 rounded-xl overflow-hidden">
               <canvas
                 ref={canvasRef}
-                className="w-full h-[500px] cursor-grab active:cursor-grabbing"
+                className="w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing"
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   const x = ((e.clientX - rect.left) / rect.width) * 800
@@ -257,7 +298,7 @@ const HealthMap = () => {
 
               {/* Coordinates */}
               <div className="absolute top-4 right-4 bg-card/90 backdrop-blur rounded-lg px-3 py-2 text-sm">
-                Zoom: {zoomLevel[0]}%
+                Zoom: {zoom}%
               </div>
             </div>
           </Card>
@@ -271,34 +312,34 @@ const HealthMap = () => {
           className="space-y-6"
         >
           {/* Map Controls */}
-          <Card className="viz-container">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Filter className="w-5 h-5 text-primary" />
+          <Card className="viz-container p-3 sm:p-4">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-1 sm:gap-2">
+              <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               Map Controls
             </h3>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {/* Layer Selection */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">Map Layer</Label>
+                <Label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">Map Layer</Label>
                 <Select value={mapLayer} onValueChange={setMapLayer}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs sm:text-sm h-8 sm:h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="satellite">Satellite</SelectItem>
-                    <SelectItem value="terrain">Terrain</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                    <SelectItem value="satellite" className="text-xs sm:text-sm">Satellite</SelectItem>
+                    <SelectItem value="terrain" className="text-xs sm:text-sm">Terrain</SelectItem>
+                    <SelectItem value="hybrid" className="text-xs sm:text-sm">Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Zoom Control */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">Zoom Level: {zoomLevel[0]}%</Label>
+                <Label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">Zoom Level: {zoom}%</Label>
                 <Slider
-                  value={zoomLevel}
-                  onValueChange={setZoomLevel}
+                  value={[zoom]}
+                  onValueChange={(value) => setZoom(value[0])}
                   max={200}
                   min={10}
                   step={10}
@@ -308,12 +349,12 @@ const HealthMap = () => {
 
               {/* Health Filter */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  Health Filter: {healthFilter[0]}% - {healthFilter[1]}%
+                <Label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">
+                  Health Filter: {healthFilter}%
                 </Label>
                 <Slider
-                  value={healthFilter}
-                  onValueChange={setHealthFilter}
+                  value={[healthFilter]}
+                  onValueChange={(value) => setHealthFilter(value[0])}
                   max={100}
                   min={0}
                   step={5}
@@ -327,8 +368,9 @@ const HealthMap = () => {
                   id="labels"
                   checked={showLabels}
                   onCheckedChange={setShowLabels}
+                  className="scale-90 sm:scale-100"
                 />
-                <Label htmlFor="labels">Show Field Labels</Label>
+                <Label htmlFor="labels" className="text-xs sm:text-sm">Show Field Labels</Label>
               </div>
             </div>
           </Card>
@@ -339,47 +381,36 @@ const HealthMap = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <Card className="viz-container">
-                <h3 className="text-lg font-semibold mb-4">Field Details</h3>
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium">{selectedField.name}</h4>
-                    <p className="text-sm text-muted-foreground">Area: {selectedField.area}</p>
-                  </div>
+              <Card className="viz-container p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-1 sm:gap-2">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  Field Details
+                </h3>
+                <div className="space-y-3 sm:space-y-4">
+                  <FieldCard
+                    id={selectedField.id}
+                    name={selectedField.name}
+                    health={selectedField.health}
+                    area={selectedField.area}
+                    isSelected={true}
+                    showDetails={true}
+                    moisture={selectedField.moisture}
+                    temperature={selectedField.temperature}
+                    ndvi={selectedField.ndvi}
+                    stress={selectedField.stress}
+                    className="border-primary/30 bg-primary/5"
+                  />
                   
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">Health Score:</span>
-                    <Badge variant="outline" className={getHealthBadge(selectedField.health)}>
-                      {selectedField.health}%
-                    </Badge>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button size="sm" className="w-full bg-gradient-primary text-xs sm:text-sm py-1 h-8 sm:h-9">
+                      <LineChart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                      <span className="truncate">View Detailed Analysis</span>
+                    </Button>
+                    <Button size="sm" variant="outline" className="w-full text-xs sm:text-sm py-1 h-8 sm:h-9">
+                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                      <span className="truncate">View History</span>
+                    </Button>
                   </div>
-
-                  <div className="pt-2 border-t border-border/60">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">NDVI:</span>
-                        <div className="font-medium">0.{Math.floor(selectedField.health * 0.8)}</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Moisture:</span>
-                        <div className="font-medium">{Math.floor(selectedField.health * 0.7)}%</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Temperature:</span>
-                        <div className="font-medium">{(24 + Math.random() * 6).toFixed(1)}°C</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Stress Level:</span>
-                        <div className={`font-medium ${getHealthColor(selectedField.health)}`}>
-                          {selectedField.health > 70 ? 'Low' : selectedField.health > 40 ? 'Medium' : 'High'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button size="sm" className="w-full bg-gradient-primary">
-                    View Detailed Analysis
-                  </Button>
                 </div>
               </Card>
             </motion.div>
@@ -391,28 +422,22 @@ const HealthMap = () => {
               <Layers className="w-5 h-5 text-primary" />
               Field Overview
             </h3>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 max-h-[400px] overflow-y-auto pr-1">
               {fieldData.map((field) => (
-                <motion.div
+                <FieldCard
                   key={field.id}
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-3 rounded-lg border transition-all cursor-pointer ${
-                    selectedField?.id === field.id 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border/60 hover:border-primary/50'
-                  }`}
+                  id={field.id}
+                  name={field.name}
+                  health={field.health}
+                  area={field.area}
+                  isSelected={selectedField?.id === field.id}
                   onClick={() => setSelectedField(field)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-sm">{field.name}</h4>
-                      <p className="text-xs text-muted-foreground">{field.area}</p>
-                    </div>
-                    <Badge variant="outline" className={getHealthBadge(field.health)}>
-                      {field.health}%
-                    </Badge>
-                  </div>
-                </motion.div>
+                  showDetails={selectedField?.id === field.id}
+                  moisture={field.moisture}
+                  temperature={field.temperature}
+                  ndvi={field.ndvi}
+                  stress={field.stress}
+                />
               ))}
             </div>
           </Card>
