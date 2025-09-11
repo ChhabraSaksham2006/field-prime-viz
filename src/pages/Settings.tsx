@@ -139,12 +139,7 @@ const SettingsPage = () => {
       transition={{ duration: 0.5 }}
       className="container mx-auto py-6"
     >
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Settings', href: '#' },
-        ]}
-      />
+      <Breadcrumbs />
       
       <div className="flex items-center justify-between mb-6 mt-4">
         <div>
@@ -265,6 +260,90 @@ const SettingsPage = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="profile">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>Manage your personal information and account details.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl font-semibold">
+                    {profile.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium">{profile.name}</h3>
+                    <p className="text-sm text-muted-foreground">{profile.role}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-name">Full Name</Label>
+                    <Input 
+                      id="profile-name" 
+                      value={profile.name}
+                      onChange={(e) => setProfile({...profile, name: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-email">Email Address</Label>
+                    <Input 
+                      id="profile-email" 
+                      type="email" 
+                      value={profile.email}
+                      onChange={(e) => setProfile({...profile, email: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-phone">Phone Number</Label>
+                    <Input 
+                      id="profile-phone" 
+                      value={profile.phone}
+                      onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-organization">Organization</Label>
+                    <Input 
+                      id="profile-organization" 
+                      value={profile.organization}
+                      onChange={(e) => setProfile({...profile, organization: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="profile-role">Role</Label>
+                  <Select 
+                    value={profile.role}
+                    onValueChange={(value) => setProfile({...profile, role: value})}
+                  >
+                    <SelectTrigger id="profile-role">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Farm Manager">Farm Manager</SelectItem>
+                      <SelectItem value="Agronomist">Agronomist</SelectItem>
+                      <SelectItem value="Field Technician">Field Technician</SelectItem>
+                      <SelectItem value="Data Analyst">Data Analyst</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleSaveSettings}>Save Profile</Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -323,7 +402,10 @@ const SettingsPage = () => {
                     <Label className="text-base">Data Sharing</Label>
                     <p className="text-sm text-muted-foreground">Allow anonymous usage data to improve services</p>
                   </div>
-                  <Switch checked={dataSharing} onCheckedChange={setDataSharing} />
+                  <Switch 
+                    checked={dataSharing.analytics} 
+                    onCheckedChange={(checked) => setDataSharing(prev => ({...prev, analytics: checked}))} 
+                  />
                 </div>
 
                 <div className="space-y-2">

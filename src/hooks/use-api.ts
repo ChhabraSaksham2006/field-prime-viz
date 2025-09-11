@@ -6,6 +6,13 @@ export const useApiData = () => {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 2; // Maximum number of retry attempts
+
+  // Function to manually retry the data fetch
+  const retryFetch = () => {
+    setRetryCount(prev => prev + 1);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,30 +25,45 @@ export const useApiData = () => {
         console.log('Data loaded successfully:', loadDataResponse);
         
         if (loadDataResponse.success) {
-          // Run analysis on the loaded data
-          const analysisResponse = await apiService.runAnalysis();
-          console.log('Analysis completed successfully:', analysisResponse);
-          
-          if (analysisResponse.success) {
-            setData(analysisResponse);
-          } else {
-            setError(analysisResponse.message || 'Error running analysis');
+          try {
+            // Run analysis on the loaded data with timeout handling
+            const analysisResponse = await apiService.runAnalysis();
+            console.log('Analysis completed successfully:', analysisResponse);
+            
+            if (analysisResponse.success) {
+              setData(analysisResponse);
+              setRetryCount(0); // Reset retry count on success
+            } else {
+              setError(analysisResponse.message || 'Error running analysis');
+            }
+          } catch (analysisErr: any) {
+            console.error('Analysis error:', analysisErr);
+            
+            // Handle timeout specifically
+            if (analysisErr.code === 'ECONNABORTED' && retryCount < maxRetries) {
+              console.log(`Analysis timed out. Retrying (${retryCount + 1}/${maxRetries})...`);
+              setRetryCount(prev => prev + 1);
+              // Don't set error or isLoading to false - we'll retry
+              return;
+            }
+            
+            setError(analysisErr.message || 'Failed to run analysis');
           }
         } else {
           setError(loadDataResponse.message || 'Error loading data');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('API error:', err);
-        setError('Failed to fetch data from API');
+        setError(err.message || 'Failed to fetch data from API');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [retryCount]); // Re-run when retryCount changes
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, retryFetch };
 };
 
 // Hook for running analysis on demand

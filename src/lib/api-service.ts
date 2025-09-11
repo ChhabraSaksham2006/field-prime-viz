@@ -6,7 +6,7 @@ const API_BASE_URL = 'http://localhost:5000';
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 30000, // 30 seconds timeout
   headers: {
     'Content-Type': 'application/json'
   }
@@ -38,13 +38,18 @@ const apiService = {
   runAnalysis: async () => {
     try {
       console.log('Fetching data from /api/run_analysis');
-      const response = await api.get('/api/run_analysis');
+      // Use a longer timeout specifically for this intensive operation
+      const response = await api.get('/api/run_analysis', {
+        timeout: 60000 // 60 seconds timeout for this specific call
+      });
       return response.data;
     } catch (error) {
       console.error('Error running analysis:', error);
       toast({
         title: 'Error running analysis',
-        description: 'Could not connect to the server. Please try again later.',
+        description: error.code === 'ECONNABORTED' ? 
+          'Analysis timed out. The operation might be too intensive. Please try again later.' : 
+          'Could not connect to the server. Please try again later.',
         variant: 'destructive'
       });
       throw error;

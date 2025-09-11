@@ -49,7 +49,10 @@ const Dashboard = () => {
   const { data: initialData } = useInitialData();
   
   // Use API hook for HTTP data
-  const { data: apiData, isLoading: isApiLoading, error: apiError } = useApiData();
+  const { data: apiData, isLoading: isApiLoading, error: apiError, retryFetch } = useApiData();
+  
+  // State to track analysis status
+  const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   
   // State to store the combined data
   const [iotData, setIotData] = useState<any[]>([]);
@@ -57,13 +60,16 @@ const Dashboard = () => {
   
   // Log API data when it's loaded
   useEffect(() => {
-    if (apiData) {
+    if (isApiLoading) {
+      setAnalysisStatus('loading');
+    } else if (apiData) {
       console.log('API data loaded:', apiData);
-    }
-    if (apiError) {
+      setAnalysisStatus('success');
+    } else if (apiError) {
       console.error('API error:', apiError);
+      setAnalysisStatus('error');
     }
-  }, [apiData, apiError]);
+  }, [apiData, apiError, isApiLoading]);
   
   // Update the data when real-time updates are received
   useEffect(() => {
@@ -203,6 +209,27 @@ const Dashboard = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
+        {/* Analysis Status Indicator */}
+        {analysisStatus === 'loading' && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-amber-100 text-amber-800 px-3 py-1.5 rounded-md text-sm">
+            <div className="animate-spin h-4 w-4 border-2 border-amber-600 rounded-full border-t-transparent"></div>
+            Processing data analysis...
+          </div>
+        )}
+        {analysisStatus === 'error' && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-100 text-red-800 px-3 py-1.5 rounded-md text-sm">
+            <AlertTriangle className="h-4 w-4" />
+            Analysis failed.
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="ml-2 h-7 px-2 text-xs bg-red-50 hover:bg-red-100 border-red-200"
+              onClick={retryFetch}
+            >
+              Retry
+            </Button>
+          </div>
+        )}
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gradient-primary mb-1 sm:mb-2">Agricultural Dashboard</h1>
           <p className="text-base sm:text-lg text-muted-foreground">Smart India Hackathon 2025 - Precision Agriculture Platform</p>

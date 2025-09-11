@@ -448,7 +448,7 @@ const Team = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Team Management</span>
-                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Data Sources</span>
@@ -456,7 +456,7 @@ const Team = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Settings</span>
-                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
                         </div>
                       </div>
                     </CardContent>

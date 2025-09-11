@@ -116,30 +116,38 @@ def prepare_training_data(hypercube, ground_truth):
 def run_prediction(model, hypercube):
     """
     Performs a pixel-by-pixel classification on the entire hypercube.
+    Uses batch processing for improved performance.
     """
     height, width, _ = hypercube.shape
     pad_width = PATCH_SIZE // 2
     padded_cube = np.pad(hypercube, ((pad_width, pad_width), (pad_width, pad_width), (0, 0)), mode='constant')
 
     prediction_map = np.zeros((height, width), dtype=np.int64)
+    batch_size = 128  # Process 128 pixels at a time
 
-    model.eval() # Set model to evaluation mode
-    with torch.no_grad(): # Disable gradient calculation for inference
-        for r in range(height):
-            patches_row = []
+    model.eval()  # Set model to evaluation mode
+    with torch.no_grad():  # Disable gradient calculation for inference
+        # Process the image in batches for better performance
+        for r in range(0, height, 1):  # Still process one row at a time
+            all_patches = []
             for c in range(width):
                 patch = padded_cube[r:r+PATCH_SIZE, c:c+PATCH_SIZE, :]
-                patches_row.append(patch)
+                all_patches.append(patch)
             
-            patches_row = np.array(patches_row, dtype=np.float32)
-            patches_row = np.expand_dims(patches_row, axis=1) # Add channel dimension
+            # Convert all patches to numpy array
+            all_patches = np.array(all_patches, dtype=np.float32)
+            all_patches = np.expand_dims(all_patches, axis=1)  # Add channel dimension
             
-            # Convert to PyTorch tensor
-            input_tensor = torch.from_numpy(patches_row)
-            
-            outputs = model(input_tensor)
-            predicted_labels = torch.argmax(outputs, dim=1).cpu().numpy()
-            prediction_map[r, :] = predicted_labels + 1 # Add 1 to match original label values
+            # Process in batches
+            for i in range(0, width, batch_size):
+                batch_patches = all_patches[i:min(i+batch_size, width)]
+                
+                # Convert to PyTorch tensor
+                input_tensor = torch.from_numpy(batch_patches)
+                
+                outputs = model(input_tensor)
+                predicted_labels = torch.argmax(outputs, dim=1).cpu().numpy()
+                prediction_map[r, i:min(i+batch_size, width)] = predicted_labels + 1  # Add 1 to match original label values
 
     # Create a summary of the classification
     unique_classes, counts = np.unique(prediction_map, return_counts=True)
