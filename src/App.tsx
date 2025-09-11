@@ -37,7 +37,15 @@ const App = () => (
                 <Dashboard />
               </AppLayout>
             } />
-
+            <Route path="/upload" element={
+              <AppLayout>
+                <div className="text-center py-20">
+                  <h1 className="text-2xl font-bold text-gradient-primary">
+                    Image Upload Coming Soon
+                  </h1>
+                </div>
+              </AppLayout>
+            } />
             <Route path="/health-map" element={
               <AppLayout>
                 <HealthMap />

@@ -243,7 +243,7 @@ const HealthMap = () => {
     return 'text-health-critical'
   }
 
-  const getHealthBadgeClass = (health: number) => {
+  const getHealthBadge = (health: number) => {
     if (health >= 85) return 'bg-health-excellent/10 text-health-excellent border-health-excellent/20'
     if (health >= 70) return 'bg-health-good/10 text-health-good border-health-good/20'
     if (health >= 55) return 'bg-health-moderate/10 text-health-moderate border-health-moderate/20'
@@ -252,45 +252,46 @@ const HealthMap = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8 w-full max-w-full">
       <Breadcrumbs />
       
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
       >
         <div>
-          <h1 className="text-4xl font-bold text-gradient-primary mb-2">Interactive Health Map</h1>
-          <p className="text-lg text-muted-foreground">Real-time crop health visualization with zoom and pan capabilities</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gradient-primary mb-2">Interactive Health Map</h1>
+          <p className="text-base md:text-lg text-muted-foreground">Real-time crop health visualization with zoom and pan capabilities</p>
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex gap-2 mt-4 lg:mt-0"
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="flex gap-2 mt-4 lg:mt-0 flex-shrink-0"
         >
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export Map
           </Button>
-          <Button className="bg-gradient-primary">
+          <Button className="bg-gradient-primary shadow-glow">
             <Satellite className="w-4 h-4 mr-2" />
             Satellite View
           </Button>
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full">
         {/* Map Visualization */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-2"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="lg:col-span-2 w-full h-full flex flex-col"
         >
-          <Card className="viz-container">
+          <Card className="viz-container p-4 relative h-full">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Map className="w-5 h-5 text-primary" />
@@ -325,10 +326,10 @@ const HealthMap = () => {
             </div>
 
             {/* Interactive Canvas Map */}
-            <div className="relative bg-muted/20 rounded-xl overflow-hidden">
+            <div className="relative bg-muted/20 rounded-xl overflow-hidden flex-1">
               <canvas
                 ref={canvasRef}
-                className="w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing"
+                className="w-full h-full min-h-[400px] cursor-grab active:cursor-grabbing"
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   const x = ((e.clientX - rect.left) / rect.width) * 800
@@ -414,8 +415,8 @@ const HealthMap = () => {
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-6"
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="space-y-4 sm:space-y-6 w-full"
         >
           {/* Map Controls */}
           <Card className="viz-container p-3 sm:p-4">
@@ -523,7 +524,7 @@ const HealthMap = () => {
           )}
 
           {/* Field List */}
-          <Card className="viz-container">
+          <Card className="viz-container p-3 sm:p-4 w-full">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary" />
               Field Overview
@@ -547,111 +548,6 @@ const HealthMap = () => {
               ))}
             </div>
           </Card>
-        </motion.div>
-        
-        {/* Field Health Distribution - Added to match Dashboard layout */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="viz-container p-3 sm:p-4">
-            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2">
-              <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              Field Health Distribution
-            </h3>
-            <div className="flex justify-center items-center h-[200px] sm:h-[250px]">
-              <div className="w-full max-w-[250px] aspect-square relative">
-                {/* Placeholder for pie chart - in a real app, you would use a chart component */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-health-excellent via-health-good to-health-poor flex items-center justify-center">
-                  <div className="bg-card rounded-full w-[60%] h-[60%] flex items-center justify-center text-center">
-                    <div>
-                      <div className="text-xl sm:text-2xl font-bold">78%</div>
-                      <div className="text-xs text-muted-foreground">Healthy Fields</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-health-excellent rounded-full"></div>
-                <span className="text-xs">Excellent (40%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-health-good rounded-full"></div>
-                <span className="text-xs">Good (38%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-health-moderate rounded-full"></div>
-                <span className="text-xs">Moderate (12%)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-health-poor rounded-full"></div>
-                <span className="text-xs">Poor (10%)</span>
-              </div>
-            </div>
-          </Card>
-          
-          {/* Field Alerts & Status - Added to match Dashboard layout */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-4 md:mt-6"
-          >
-            <Card className="viz-container p-3 sm:p-4">
-              <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-1 sm:gap-2">
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                Field Alerts & Status
-              </h3>
-              <div className="space-y-3 sm:space-y-4">
-                {fieldData.slice(0, 3).map((field, index) => (
-                  <motion.div
-                    key={field.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 + (index * 0.1) }}
-                    className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/60 hover:bg-muted/50 transition-colors cursor-pointer"
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Alert for ${field.name}`}
-                    onClick={() => setSelectedField(field)}
-                  >
-                    <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full animate-pulse flex-shrink-0 ${
-                      field.health > 80 ? 'bg-health-excellent' :
-                      field.health > 60 ? 'bg-health-good' :
-                      field.health > 40 ? 'bg-health-moderate' : 'bg-health-poor'
-                    }`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
-                        <span className="font-medium text-sm sm:text-base truncate">{field.name}</span>
-                        <Badge 
-                          variant="outline" 
-                          className={getHealthBadgeClass(field.health)}
-                        >
-                          {field.health > 80 ? <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> :
-                           field.health > 40 ? <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> :
-                           <AlertTriangle className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />}
-                          {field.health > 80 ? 'Healthy' :
-                           field.health > 60 ? 'Good' :
-                           field.health > 40 ? 'Warning' : 'Critical'}
-                        </Badge>
-                      </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                        {field.health > 80 ? 'All parameters within optimal range' :
-                         field.health > 60 ? 'Minor variations in soil moisture' :
-                         field.health > 40 ? 'Moderate stress detected' : 'Critical conditions detected'}
-                      </p>
-                    </div>
-                    <div className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                      Now
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
         </motion.div>
       </div>
     </div>
