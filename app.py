@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
 import os
 import base64
 import numpy as np
@@ -14,8 +13,7 @@ from modules.iot_generator import generate_iot_data
 from modules.model_handler import run_prediction, CropClassifier, PATCH_SIZE
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+CORS(app)
 
 # --- Global Variables (to store data in memory for the session) ---
 hypercube_data = None
@@ -101,7 +99,6 @@ def api_run_analysis():
 def api_get_spectral_signature():
     x = int(request.args.get('x'))
     y = int(request.args.get('y'))
-    crop_type = request.args.get('crop_type')
 
     if hypercube_data is None:
         return jsonify({'success': False, 'message': 'Hyperspectral data not loaded.'}), 400
@@ -109,73 +106,11 @@ def api_get_spectral_signature():
     try:
         # Extract the full spectral vector for the clicked pixel
         spectral_signature = hypercube_data[y, x, :].tolist()
-        
-        # If crop_type is provided, we could modify the signature based on crop type
-        # This is a simplified example - in a real application, you might have different
-        # processing for different crop types or filter data differently
-        if crop_type:
-            print(f"Processing spectral signature for crop type: {crop_type}")
-            # Example: Add crop type to response
-            return jsonify({
-                'success': True, 
-                'spectral_signature': spectral_signature,
-                'crop_type': crop_type
-            })            
-        
         return jsonify({'success': True, 'spectral_signature': spectral_signature})
     except IndexError:
         return jsonify({'success': False, 'message': 'Invalid pixel coordinates.'}), 400
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error getting spectral signature: {str(e)}'}), 500
 
-# Socket.IO event handlers
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
-
-@socketio.on('request_initial_data')
-def handle_request_initial_data(data=None):
-    # Send initial data to the client
-    print('Received request_initial_data event')
-    if hypercube_data is not None:
-        # Create a simple response with basic info
-        print('Sending initial_data event')
-        emit('initial_data', generate_iot_data(24))
-    else:
-        print('Sending mock initial_data event')
-        emit('initial_data', generate_iot_data(24))
-
-# Additional Socket.IO events can be added here
-@socketio.on('request_analysis')
-def handle_request_analysis(data=None):
-    print('Received request_analysis event')
-    if hypercube_data is None or trained_model is None:
-        emit('analysis_error', {'message': 'Data or model not loaded'})
-        return
-    
-    try:
-        # IoT Data
-        iot_data = generate_iot_data(24)
-        
-        # AI Prediction
-        prediction_map_data, class_summary = run_prediction(trained_model, hypercube_data)
-        
-        # Convert prediction map to a flat list for easy transfer to JS
-        prediction_map_flat = prediction_map_data.flatten().tolist()
-        
-        print('Sending analysis_result event')
-        emit('analysis_result', {
-            'iot_data': iot_data,
-            'prediction_map': prediction_map_flat,
-            'class_summary': class_summary
-        })
-    except Exception as e:
-        print(f'Analysis error: {str(e)}')
-        emit('analysis_error', {'message': str(e)})
-
 if __name__ == '__main__':
-    socketio.run(app, debug=True) # Use socketio.run instead of app.run
+    app.run(debug=True) # debug=True allows auto-reloading and better error messages

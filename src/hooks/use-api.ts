@@ -82,7 +82,7 @@ export const useSpectralSignature = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getSignature = async (x: number, y: number, cropType?: string) => {
+  const getSignature = async (x: number, y: number) => {
     try {
       setIsLoading(true);
       setError(null);

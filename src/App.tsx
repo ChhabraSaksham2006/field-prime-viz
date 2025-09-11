@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
-import ImageUpload from "./pages/ImageUpload";
 import HealthMap from "./pages/HealthMap";
 import TerrainVisualization from "./pages/TerrainVisualization";
 import SpectralAnalysis from "./pages/SpectralAnalysis";
@@ -38,11 +37,7 @@ const App = () => (
                 <Dashboard />
               </AppLayout>
             } />
-            <Route path="/upload" element={
-              <AppLayout>
-                <ImageUpload />
-              </AppLayout>
-            } />
+
             <Route path="/health-map" element={
               <AppLayout>
                 <HealthMap />

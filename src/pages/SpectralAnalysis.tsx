@@ -142,7 +142,7 @@ const SpectralAnalysis = () => {
   // Fetch spectral signature data from API when component mounts or crop type changes
   useEffect(() => {
     // Use center coordinates as default and pass crop type
-    getSignature(50, 50, cropType);
+    getSignature(50, 50);
   }, [cropType])
   
   // Combine spectral data from live updates and API
@@ -320,7 +320,7 @@ const SpectralAnalysis = () => {
                    apiSpectralData ? "API Ready" : 
                    apiError ? "API Error" : "API Idle"}
                 </Badge>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => getSignature(50, 50, cropType)}>
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => getSignature(50, 50)}>
                   <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </Button>
               </div>

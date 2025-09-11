@@ -32,8 +32,6 @@ class SocketService {
     this.socket.on('disconnect', () => {
       console.log('Socket disconnected');
       this._isConnected = false;
-      // Notify listeners about disconnection
-      this.notifyListeners('disconnect', {});
     });
 
     this.socket.on('connect_error', (error) => {

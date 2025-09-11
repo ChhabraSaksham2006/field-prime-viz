@@ -41,12 +41,6 @@ const navigationItems = [
     description: "Agricultural Analytics Overview"
   },
   {
-    title: "Image Upload",
-    url: "/upload",
-    icon: Upload,
-    description: "Hyperspectral Image Analysis"
-  },
-  {
     title: "Health Map",
     url: "/health-map",
     icon: Map,
