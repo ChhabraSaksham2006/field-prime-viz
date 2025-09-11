@@ -9,6 +9,10 @@ import Dashboard from "./pages/Dashboard";
 import HealthMap from "./pages/HealthMap";
 import TerrainVisualization from "./pages/TerrainVisualization";
 import SpectralAnalysis from "./pages/SpectralAnalysis";
+import Settings from "./pages/Settings";
+import FieldManagement from "./pages/FieldManagement";
+import Team from "./pages/Team";
+import { DataSources } from "./pages/DataSources";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -63,38 +67,22 @@ const App = () => (
             } />
             <Route path="/settings" element={
               <AppLayout>
-                <div className="text-center py-20">
-                  <h1 className="text-2xl font-bold text-gradient-primary">
-                    Settings Coming Soon
-                  </h1>
-                </div>
+                <Settings />
               </AppLayout>
             } />
             <Route path="/fields" element={
               <AppLayout>
-                <div className="text-center py-20">
-                  <h1 className="text-2xl font-bold text-gradient-primary">
-                    Field Management Coming Soon
-                  </h1>
-                </div>
+                <FieldManagement />
               </AppLayout>
             } />
             <Route path="/data" element={
               <AppLayout>
-                <div className="text-center py-20">
-                  <h1 className="text-2xl font-bold text-gradient-primary">
-                    Data Sources Coming Soon
-                  </h1>
-                </div>
+                <DataSources />
               </AppLayout>
             } />
             <Route path="/team" element={
               <AppLayout>
-                <div className="text-center py-20">
-                  <h1 className="text-2xl font-bold text-gradient-primary">
-                    Team Management Coming Soon
-                  </h1>
-                </div>
+                <Team />
               </AppLayout>
             } />
             
