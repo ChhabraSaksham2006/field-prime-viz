@@ -44,6 +44,27 @@ import {
 } from 'recharts'
 
 const Dashboard = () => {
+  // Load JotForm chatbot only on dashboard
+  useEffect(() => {
+    const chatbotId = 'jotform-chatbot-script'
+    let scriptEl: HTMLScriptElement | null = document.getElementById(chatbotId) as HTMLScriptElement | null
+    if (!scriptEl) {
+      scriptEl = document.createElement('script')
+      scriptEl.id = chatbotId
+      scriptEl.src = 'https://cdn.jotfor.ms/agent/embedjs/01993c5c9df47af5b1e0e2b30c679e396486/embed.js'
+      scriptEl.async = true
+      scriptEl.onload = () => console.log('JotForm chatbot loaded on dashboard')
+      scriptEl.onerror = () => console.error('Failed to load JotForm chatbot')
+      document.head.appendChild(scriptEl)
+    }
+    return () => {
+      // Remove script and any inserted widgets when leaving dashboard
+      const existing = document.getElementById(chatbotId)
+      if (existing) existing.remove()
+      const widgets = document.querySelectorAll('[data-jotform-widget], .jotform-widget, iframe[src*="jotform"]')
+      widgets.forEach((el) => el.remove())
+    }
+  }, [])
   // Use socket hooks for real-time data
   const { data: realtimeData, isConnected } = useIoTData();
   const { data: initialData } = useInitialData();

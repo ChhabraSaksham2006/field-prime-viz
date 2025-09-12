@@ -2,6 +2,7 @@ import { Bell, Search, User, ChevronDown, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
+import { useAuth } from "@/contexts/AuthContext"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,15 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 export function Header() {
+  const { logout } = useAuth();
+  
+  const handleSignOut = () => {
+    logout();
+    // Dispatch custom event for the chatbot to detect
+    const authChangeEvent = new CustomEvent('authChange', { detail: { isAuthenticated: false } });
+    document.dispatchEvent(authChangeEvent);
+  };
+  
   return (
     <header className="h-16 border-b border-border/60 bg-background/80 backdrop-blur-lg sticky top-0 z-50">
       <div className="flex items-center justify-between h-full px-3 sm:px-6">
@@ -73,7 +83,7 @@ export function Header() {
               <DropdownMenuItem>Team Management</DropdownMenuItem>
               <DropdownMenuItem>Data Preferences</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">Sign out</DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>Sign out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
