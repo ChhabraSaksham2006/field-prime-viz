@@ -12,7 +12,7 @@ import SpectralAnalysis from "./pages/SpectralAnalysis";
 import Settings from "./pages/Settings";
 import FieldManagement from "./pages/FieldManagement";
 import Team from "./pages/Team";
-import { DataSources } from "./pages/DataSources";
+import DataSources from './pages/DataSources';
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Login from "./pages/Login";

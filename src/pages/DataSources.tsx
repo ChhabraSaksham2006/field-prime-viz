@@ -655,4 +655,4 @@ const DataSources = () => {
   );
 };
 
-export { DataSources };
+export default DataSources;

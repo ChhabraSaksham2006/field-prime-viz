@@ -12,7 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 
 const FieldManagement = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [fields, setFields] = useState([
     { id: 1, name: 'North Field', area: '12.5', crop: 'Wheat', health: 'Good', lastInspection: '2023-10-15' },
     { id: 2, name: 'South Field', area: '8.3', crop: 'Corn', health: 'Excellent', lastInspection: '2023-10-12' },
@@ -43,39 +42,32 @@ const FieldManagement = () => {
       return;
     }
 
-    setIsLoading(true);
+    const newId = fields.length > 0 ? Math.max(...fields.map(f => f.id)) + 1 : 1;
     
-    // Simulate API call
-    setTimeout(() => {
-      const newId = fields.length > 0 ? Math.max(...fields.map(f => f.id)) + 1 : 1;
-      
-      setFields(prev => [
-        ...prev,
-        {
-          id: newId,
-          name: newField.name,
-          area: newField.area,
-          crop: newField.crop,
-          health: 'Not assessed',
-          lastInspection: 'N/A',
-        },
-      ]);
+    setFields(prev => [
+      ...prev,
+      {
+        id: newId,
+        name: newField.name,
+        area: newField.area,
+        crop: newField.crop,
+        health: 'Not assessed',
+        lastInspection: 'N/A',
+      },
+    ]);
 
-      setNewField({
-        name: '',
-        area: '',
-        crop: '',
-        coordinates: '',
-        soilType: '',
-      });
+    setNewField({
+      name: '',
+      area: '',
+      crop: '',
+      coordinates: '',
+      soilType: '',
+    });
 
-      setIsLoading(false);
-      
-      toast({
-        title: 'Field added',
-        description: `${newField.name} has been added successfully.`,
-      });
-    }, 1000);
+    toast({
+      title: 'Field added',
+      description: `${newField.name} has been added successfully.`,
+    });
   };
 
   const handleDeleteField = (id: number) => {
@@ -274,22 +266,10 @@ const FieldManagement = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleAddField}>
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Field
-                  </>
-                )}
-              </Button>
+<Button onClick={handleAddField}>
+  <Plus className="mr-2 h-4 w-4" />
+  Add Field
+</Button>
             </CardFooter>
           </Card>
         </TabsContent>
