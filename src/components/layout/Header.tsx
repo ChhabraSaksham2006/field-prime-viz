@@ -135,7 +135,7 @@ export const Header: React.FC = () => {
                   <User className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
                 <div className="hidden md:block text-left">
-                  <div className="text-sm font-medium">Dr. Agri Researcher</div>
+                  <div className="text-sm font-medium">Dr. Rakesh Kumar</div>
                   <div className="text-xs text-muted-foreground">Senior Analyst</div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
