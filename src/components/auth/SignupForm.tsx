@@ -48,7 +48,7 @@ export function SignupForm() {
           <Label htmlFor="name">Full Name</Label>
           <Input
             id="name"
-            placeholder="John Doe"
+            placeholder="Enter your full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required

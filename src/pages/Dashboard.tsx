@@ -426,17 +426,17 @@ const Dashboard = () => {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            <div className="space-y-2 mt-4">
+            <div className="space-y-2 mt-4 max-w-full">
               {cropDistribution.map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div key={index} className="flex items-center justify-between gap-2 w-full">
+                  <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
                     <div 
-                      className="w-3 h-3 rounded-full" 
+                      className="w-3 h-3 rounded-full flex-shrink-0" 
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="text-sm">{item.name}</span>
+                    <span className="text-sm truncate flex-1 min-w-0">{item.name}</span>
                   </div>
-                  <span className="text-sm font-medium">{item.value}%</span>
+                  <span className="text-sm font-medium flex-shrink-0 ml-2">{item.value}%</span>
                 </div>
               ))}
             </div>

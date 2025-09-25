@@ -4,7 +4,6 @@ import { motion } from "framer-motion"
 
 const routeLabels: Record<string, string> = {
   "/": "Dashboard",
-  "/upload": "Image Upload",
   "/health-map": "Health Map",
   "/terrain": "3D Terrain",
   "/spectral": "Spectral Analysis",

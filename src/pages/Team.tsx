@@ -292,7 +292,7 @@ const Team = () => {
                     name="name" 
                     value={newMember.name} 
                     onChange={handleInputChange} 
-                    placeholder="John Doe" 
+                    placeholder="Enter full name" 
                   />
                 </div>
 
@@ -324,7 +324,7 @@ const Team = () => {
                     type="email" 
                     value={newMember.email} 
                     onChange={handleInputChange} 
-                    placeholder="john@example.com" 
+                    placeholder="name@example.com" 
                   />
                 </div>
 

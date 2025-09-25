@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Dashboard from "./pages/Dashboard";
 import HealthMap from "./pages/HealthMap";
 import TerrainVisualization from "./pages/TerrainVisualization";
@@ -17,6 +18,9 @@ import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Help from "./pages/Help";
+import GettingStarted from "./pages/help/GettingStarted";
+import FAQ from "./pages/help/FAQ";
 // AppHeader import removed as it's not needed
 import { AppSidebar } from "./components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header"; // <-- Make sure this exists
@@ -25,15 +29,19 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
             {/* Public Routes */}
             <Route path="/" element={<PublicLayout><Index /></PublicLayout>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/help" element={<PublicLayout><Help /></PublicLayout>} />
+            <Route path="/help/getting-started" element={<PublicLayout><GettingStarted /></PublicLayout>} />
+            <Route path="/help/faq" element={<PublicLayout><FAQ /></PublicLayout>} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
@@ -41,15 +49,7 @@ const App = () => (
                 <Dashboard />
               </AppLayout>
             } />
-            <Route path="/upload" element={
-              <AppLayout>
-                <div className="text-center py-20">
-                  <h1 className="text-2xl font-bold text-gradient-primary">
-                    Image Upload Coming Soon
-                  </h1>
-                </div>
-              </AppLayout>
-            } />
+
             <Route path="/health-map" element={
               <AppLayout>
                 <HealthMap />
@@ -90,7 +90,8 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

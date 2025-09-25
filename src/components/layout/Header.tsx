@@ -1,4 +1,5 @@
-import { Bell, Search, User, ChevronDown, Menu, X } from "lucide-react"
+import React from "react"
+import { Bell, Search, User, ChevronDown, Menu, X, Settings, HelpCircle, Moon, Sun, Users, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
@@ -12,15 +13,43 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
+import { useNavigate } from "react-router-dom"
+import { useTheme } from "@/contexts/ThemeContext"
 
-export function Header() {
+export const Header: React.FC = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
   
   const handleSignOut = () => {
-    logout();
-    // Dispatch custom event for the chatbot to detect
-    const authChangeEvent = new CustomEvent('authChange', { detail: { isAuthenticated: false } });
-    document.dispatchEvent(authChangeEvent);
+    try {
+      logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const handleProfileSettings = () => {
+    navigate("/settings");
+  };
+
+  const handleTeamManagement = () => {
+    navigate("/team");
+  };
+
+  const handleDataPreferences = () => {
+    navigate("/settings"); // Navigate to settings for data preferences
+  };
+  
+
+  
+  const handleSettings = () => {
+    navigate('/settings');
+  };
+  
+  const handleHelp = () => {
+    window.open('/help', '_blank');
   };
   
   return (
@@ -42,15 +71,51 @@ export function Header() {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Status indicators */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <Badge variant="outline" className="bg-health-excellent/10 text-health-excellent border-health-excellent/20">
               System Online
             </Badge>
             <Badge variant="outline" className="bg-tech-primary/10 text-tech-primary border-tech-primary/20">
               Live Data
             </Badge>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Theme Toggle */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hover:bg-accent/50" 
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+            >
+              {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
+
+            {/* Settings Button */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hover:bg-accent/50" 
+              onClick={handleSettings}
+              aria-label="Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+
+            {/* Help Button */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hover:bg-accent/50" 
+              onClick={handleHelp}
+              aria-label="Help"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </Button>
           </div>
 
           {/* Notifications */}
@@ -79,11 +144,23 @@ export function Header() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-              <DropdownMenuItem>Team Management</DropdownMenuItem>
-              <DropdownMenuItem>Data Preferences</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleProfileSettings}>
+                <User className="w-4 h-4 mr-2" />
+                Profile Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleTeamManagement}>
+                <Users className="w-4 h-4 mr-2" />
+                Team Management
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDataPreferences}>
+                <Settings className="w-4 h-4 mr-2" />
+                Data Preferences
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>Sign out</DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

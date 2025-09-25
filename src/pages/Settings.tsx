@@ -13,11 +13,12 @@ import { Progress } from '@/components/ui/progress';
 import { Settings, Bell, Lock, User, Globe, Moon, Sun, Check, Smartphone, Laptop, Cloud, Download, Upload, RefreshCw, AlertCircle, Save, Mail, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const SettingsPage = () => {
   const { toast } = useToast();
+  const { darkMode, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -37,8 +38,8 @@ const SettingsPage = () => {
   });
   
   const [profile, setProfile] = useState({
-    name: 'John Farmer',
-    email: 'john@fieldprime.com',
+    name: 'Ramesh Kumar',
+    email: 'ramesh@fieldprime.com',
     phone: '+91 98765 43210',
     organization: 'Field Prime Farms',
     role: 'Farm Manager'
@@ -113,10 +114,7 @@ const SettingsPage = () => {
   };
 
   const handleToggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    
-    // This would typically update the theme in a real application
-    document.documentElement.classList.toggle('dark', !darkMode);
+    toggleTheme();
   };
   
   const handleStartSync = () => {
@@ -223,7 +221,7 @@ const SettingsPage = () => {
                     <Sun className="h-4 w-4" />
                     <Switch 
                       checked={darkMode} 
-                      onCheckedChange={setDarkMode} 
+                      onCheckedChange={toggleTheme} 
                     />
                     <Moon className="h-4 w-4" />
                   </div>
