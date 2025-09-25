@@ -125,7 +125,7 @@ export function AppSidebar() {
           {!isCollapsed && (
             <div className="overflow-hidden">
               <h1 className="font-bold text-base sm:text-lg text-gradient-primary truncate">AgriTech Pro</h1>
-              <p className="text-xs text-muted-foreground truncate">Smart India Hackathon 2025</p>
+              <p className="text-xs text-muted-foreground truncate">Team HyperScanner </p>
             </div>
           )}
         </div>
