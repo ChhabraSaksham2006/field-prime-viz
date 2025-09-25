@@ -156,7 +156,7 @@ const Team = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="w-full p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Team Management</h1>
@@ -182,7 +182,7 @@ const Team = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Select defaultValue="all">
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[240px]">
                       <SelectValue placeholder="Filter by role" />
                     </SelectTrigger>
                     <SelectContent>
@@ -199,14 +199,14 @@ const Team = () => {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[250px]">Name</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[280px]">Name</TableHead>
+                        <TableHead className="w-[180px]">Role</TableHead>
+                        <TableHead className="w-[300px]">Contact</TableHead>
+                        <TableHead className="w-[140px]">Status</TableHead>
+                        <TableHead className="text-right w-[180px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
                 <TableBody>
                   {teamMembers.map((member) => (
                     <TableRow key={member.id}>
@@ -284,7 +284,7 @@ const Team = () => {
               <CardDescription>Add a new member to your agricultural team.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name*</Label>
                   <Input 
@@ -368,7 +368,7 @@ const Team = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Card className="border-2 border-primary">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Farm Manager</CardTitle>

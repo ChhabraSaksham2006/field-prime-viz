@@ -103,7 +103,7 @@ const FieldManagement = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="w-full p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Field Management</h1>
@@ -128,15 +128,15 @@ const FieldManagement = () => {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[180px]">Name</TableHead>
-                    <TableHead>Area (ha)</TableHead>
-                    <TableHead>Current Crop</TableHead>
-                    <TableHead>Health Status</TableHead>
-                    <TableHead>Last Inspection</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[250px]">Name</TableHead>
+                        <TableHead className="w-[140px]">Area (ha)</TableHead>
+                        <TableHead className="w-[180px]">Current Crop</TableHead>
+                        <TableHead className="w-[160px]">Health Status</TableHead>
+                        <TableHead className="w-[180px]">Last Inspection</TableHead>
+                        <TableHead className="text-right w-[160px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
                 <TableBody>
                   {fields.map((field) => (
                     <TableRow key={field.id}>
@@ -174,7 +174,7 @@ const FieldManagement = () => {
               <CardDescription>Register a new agricultural field to your account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Field Name</Label>
                   <Input 
@@ -196,9 +196,6 @@ const FieldManagement = () => {
                     placeholder="e.g., 12.5" 
                   />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="crop">Current Crop</Label>
                   <Select 
@@ -206,18 +203,22 @@ const FieldManagement = () => {
                     value={newField.crop}
                   >
                     <SelectTrigger id="crop">
-                      <SelectValue placeholder="Select crop type" />
+                      <SelectValue placeholder="Select crop" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Wheat">Wheat</SelectItem>
                       <SelectItem value="Corn">Corn</SelectItem>
-                      <SelectItem value="Soybeans">Soybeans</SelectItem>
                       <SelectItem value="Rice">Rice</SelectItem>
+                      <SelectItem value="Barley">Barley</SelectItem>
+                      <SelectItem value="Soybeans">Soybeans</SelectItem>
                       <SelectItem value="Cotton">Cotton</SelectItem>
                       <SelectItem value="Sugarcane">Sugarcane</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="soilType">Soil Type</Label>
                   <Select 
@@ -239,7 +240,7 @@ const FieldManagement = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="coordinates">Coordinates (optional)</Label>
                   <Input 
@@ -260,17 +261,16 @@ const FieldManagement = () => {
                     onChange={handleInputChange} 
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="harvestDate">Expected Harvest Date (optional)</Label>
-                <Input 
-                  id="harvestDate" 
-                  name="harvestDate" 
-                  type="date"
-                  value={newField['harvestDate'] || ''}
-                  onChange={handleInputChange} 
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="harvestDate">Expected Harvest Date (optional)</Label>
+                  <Input 
+                    id="harvestDate" 
+                    name="harvestDate" 
+                    type="date"
+                    value={newField['harvestDate'] || ''}
+                    onChange={handleInputChange} 
+                  />
+                </div>
               </div>
             </CardContent>
             <CardFooter>
@@ -301,15 +301,15 @@ const FieldManagement = () => {
               <CardDescription>Plan your crop rotations and schedules.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2">
                   <h3 className="text-lg font-semibold mb-4">Upcoming Planting Schedule</h3>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Field</TableHead>
-                        <TableHead>Crop</TableHead>
-                        <TableHead>Planting Date</TableHead>
+                        <TableHead className="w-[120px]">Field</TableHead>
+                        <TableHead className="w-[120px]">Crop</TableHead>
+                        <TableHead className="w-[140px]">Planting Date</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -332,14 +332,14 @@ const FieldManagement = () => {
                   </Table>
                 </div>
                 
-                <div>
+                <div className="xl:col-span-1">
                   <h3 className="text-lg font-semibold mb-4">Upcoming Harvest Schedule</h3>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Field</TableHead>
-                        <TableHead>Crop</TableHead>
-                        <TableHead>Harvest Date</TableHead>
+                        <TableHead className="w-[120px]">Field</TableHead>
+                        <TableHead className="w-[120px]">Crop</TableHead>
+                        <TableHead className="w-[140px]">Harvest Date</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -363,9 +363,9 @@ const FieldManagement = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Field</TableHead>
-                      <TableHead>Current Crop</TableHead>
-                      <TableHead>Recommended Next Crop</TableHead>
+                      <TableHead className="w-[140px]">Field</TableHead>
+                      <TableHead className="w-[140px]">Current Crop</TableHead>
+                      <TableHead className="w-[160px]">Recommended Next Crop</TableHead>
                       <TableHead>Reason</TableHead>
                     </TableRow>
                   </TableHeader>
