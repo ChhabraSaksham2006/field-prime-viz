@@ -25,7 +25,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
                 <path d="M8 12h8"/>
               </svg>
             </div>
-            <span className="font-bold text-lg">Field Prime</span>
+            <span className="font-bold text-lg">AgriTech Pro</span>
           </motion.div>
           
           {/* Navigation */}
@@ -55,9 +55,9 @@ export function PublicLayout({ children }: PublicLayoutProps) {
                     <path d="M8 12h8"/>
                   </svg>
                 </div>
-                <span className="font-bold">Field Prime</span>
+                <span className="font-bold">AgriTech Pro</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">© 2025 Field Prime. All rights reserved.</p>
+              <p className="text-sm text-muted-foreground mt-2">© 2025 AgriTech Pro. All rights reserved.</p>
             </div>
             
             <div className="flex gap-6">

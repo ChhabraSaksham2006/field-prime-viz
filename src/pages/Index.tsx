@@ -162,7 +162,7 @@ const Index = () => {
                     ease: "easeInOut"
                   }}
                 >
-                  Field Prime
+                  AgriTech Pro
                 </motion.span>
                 <br />
                 <span>Precision Agriculture Platform</span>
@@ -386,7 +386,7 @@ const Index = () => {
               
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Powered by Advanced Analytics</h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Field Prime integrates MATLAB's powerful analytical capabilities with state-of-the-art machine learning to deliver actionable insights from complex agricultural data.
+                AgriTech Pro integrates MATLAB's powerful analytical capabilities with state-of-the-art machine learning to deliver actionable insights from complex agricultural data.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -540,7 +540,7 @@ const Index = () => {
             
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Benefits for Modern Farming</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Field Prime helps agricultural professionals make data-driven decisions that improve yields while reducing environmental impact.
+              AgriTech Pro helps agricultural professionals make data-driven decisions that improve yields while reducing environmental impact.
             </p>
           </motion.div>
           

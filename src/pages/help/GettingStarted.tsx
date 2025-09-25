@@ -10,7 +10,7 @@ const GettingStarted = () => {
   const steps = [
     {
       title: "Create Your Account",
-      description: "Sign up for a Field Prime Viz account to get started",
+      description: "Sign up for a AgriTech Pro account to get started",
       completed: true,
       action: () => navigate("/signup")
     },

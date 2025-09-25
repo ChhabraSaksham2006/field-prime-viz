@@ -46,7 +46,7 @@ const FAQ = () => {
       questions: [
         {
           question: "What browsers are supported?",
-          answer: "Field Prime Viz works best on modern browsers including Chrome, Firefox, Safari, and Edge. Please ensure you're using the latest version."
+          answer: "AgriTech Pro works best on modern browsers including Chrome, Firefox, Safari, and Edge. Please ensure you're using the latest version."
         },
         {
           question: "Is my data secure?",
@@ -108,7 +108,7 @@ const FAQ = () => {
             Frequently Asked Questions
           </h1>
           <p className="text-lg text-muted-foreground">
-            Find answers to common questions about Field Prime Viz
+            Find answers to common questions about AgriTech Pro
           </p>
         </motion.div>
 

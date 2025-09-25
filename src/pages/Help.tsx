@@ -20,20 +20,20 @@ const Help = () => {
     {
       icon: BookOpen,
       title: "Getting Started",
-      description: "Learn the basics of using Field Prime Viz",
+      description: "Learn the basics of using AgriTech Pro",
       action: () => navigate("/help/getting-started")
     },
     {
       icon: FileText,
       title: "Documentation",
       description: "Comprehensive guides and API references",
-      action: () => window.open("https://docs.fieldprime.com", "_blank")
+      action: () => window.open("https://docs.agritechpro.com", "_blank")
     },
     {
       icon: Video,
       title: "Video Tutorials",
       description: "Watch step-by-step video guides",
-      action: () => window.open("https://youtube.com/fieldprime", "_blank")
+      action: () => window.open("https://youtube.com/agritechpro", "_blank")
     },
     {
       icon: HelpCircle,
@@ -47,14 +47,14 @@ const Help = () => {
     {
       icon: Mail,
       title: "Email Support",
-      description: "support@fieldprime.com",
-      action: () => window.location.href = "mailto:support@fieldprime.com"
+      description: "support@agritechpro.com",
+      action: () => window.location.href = "mailto:support@agritechpro.com"
     },
     {
       icon: MessageCircle,
       title: "Live Chat",
       description: "Chat with our support team",
-      action: () => window.open("https://chat.fieldprime.com", "_blank")
+      action: () => window.open("https://chat.agritechpro.com", "_blank")
     },
     {
       icon: Phone,
@@ -87,7 +87,7 @@ const Help = () => {
             Help Center
           </h1>
           <p className="text-lg text-muted-foreground">
-            Get the help you need to make the most of Field Prime Viz
+            Get the help you need to make the most of AgriTech Pro
           </p>
         </motion.div>
 
