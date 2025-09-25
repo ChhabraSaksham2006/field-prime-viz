@@ -36,15 +36,9 @@ import {
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: BarChart3,
     description: "Agricultural Analytics Overview"
-  },
-  {
-    title: "Image Upload",
-    url: "/upload",
-    icon: Upload,
-    description: "Hyperspectral Image Analysis"
   },
   {
     title: "Health Map",

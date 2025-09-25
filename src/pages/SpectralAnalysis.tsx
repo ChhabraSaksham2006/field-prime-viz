@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Activity, Play, Pause, RotateCcw, Download, Settings, Zap, TrendingUp } from "lucide-react"
+import { Activity, Play, Pause, RotateCcw, Download, Settings, Zap, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Breadcrumbs } from "@/components/common/Breadcrumbs"
+import { useSpectralSignature } from "@/hooks/use-api"
 import {
   LineChart,
   Line,
@@ -108,6 +109,12 @@ const SpectralAnalysis = () => {
   const [spectralData, setSpectralData] = useState(() => generateSpectralData(Date.now(), "wheat"))
   const [ndviData] = useState(() => generateNDVITimeSeries())
   const [bandData] = useState(() => generateBandData())
+  
+  // Use API hook for spectral signature
+  const { data: apiSpectralData, isLoading: isApiLoading, error: apiError, getSignature } = useSpectralSignature()
+  
+  // Combined spectral data (prefer live data, fallback to API data)
+  const [combinedSpectralData, setCombinedSpectralData] = useState<any>(null)
 
   // Real-time data updates
   useEffect(() => {
@@ -121,6 +128,37 @@ const SpectralAnalysis = () => {
 
     return () => clearInterval(interval)
   }, [isLiveMode, samplingRate, cropType])
+  
+  // Log API data when it's loaded
+  useEffect(() => {
+    if (apiSpectralData) {
+      console.log('API spectral data loaded:', apiSpectralData);
+    }
+    if (apiError) {
+      console.error('API spectral error:', apiError);
+    }
+  }, [apiSpectralData, apiError])
+  
+  // Fetch spectral signature data from API when component mounts or crop type changes
+  useEffect(() => {
+    // Use center coordinates as default and pass crop type
+    getSignature(50, 50);
+  }, [cropType])
+  
+  // Combine spectral data from live updates and API
+  useEffect(() => {
+    if (spectralData) {
+      setCombinedSpectralData(spectralData);
+    } else if (apiSpectralData && apiSpectralData.spectral_signature) {
+      // Transform API spectral data to match the format of live data
+      const transformedData = apiSpectralData.spectral_signature.map((value: number, index: number) => ({
+        wavelength: 400 + index * 10,
+        reflectance: value,
+        timestamp: Date.now()
+      }));
+      setCombinedSpectralData(transformedData);
+    }
+  }, [spectralData, apiSpectralData])
 
   const calculateVegetationIndices = (data: any[]) => {
     const red = data.find(d => d.wavelength === 680)?.reflectance || 0.15
@@ -275,14 +313,21 @@ const SpectralAnalysis = () => {
                 <Badge variant="outline" className={isLiveMode ? "bg-health-excellent/10 text-health-excellent border-health-excellent/20" : "bg-muted/10"}>
                   {isLiveMode ? "Streaming" : "Offline"}
                 </Badge>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                <Badge variant="outline" className={isApiLoading ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" : 
+                  apiSpectralData ? "bg-health-excellent/10 text-health-excellent border-health-excellent/20" : 
+                  apiError ? "bg-red-500/10 text-red-500 border-red-500/20" : "bg-muted/10"}>
+                  {isApiLoading ? "API Loading" : 
+                   apiSpectralData ? "API Ready" : 
+                   apiError ? "API Error" : "API Idle"}
+                </Badge>
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => getSignature(50, 50)}>
                   <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>
 
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={spectralData}>
+              <LineChart data={combinedSpectralData || spectralData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
                   dataKey="wavelength" 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf, CheckCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SignupForm() {
   const [name, setName] = useState("");
@@ -13,12 +14,15 @@ export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { login } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     // Simulate signup - replace with actual registration
     setTimeout(() => {
+      login(); // Set authenticated state
       setIsLoading(false);
       navigate("/dashboard");
     }, 1500);

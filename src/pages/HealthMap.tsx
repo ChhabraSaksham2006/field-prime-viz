@@ -34,6 +34,15 @@ import { Breadcrumbs } from "@/components/common/Breadcrumbs"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FieldCard } from "@/components/dashboard/FieldCard"
+// TODO: Implement socket hook
+// For now, return mock data structure
+const usePredictionMap = () => {
+  return {
+    data: null,
+    isConnected: false
+  }
+}
+import { useApiData } from "@/hooks/use-api"
 
 // Mock field data with health indices
 const fieldData = [
@@ -44,6 +53,22 @@ const fieldData = [
   { id: 5, name: "West Field E", health: 38, area: "19.5 ha", coords: [50, 200], color: "#ef4444", moisture: 30, temperature: 33, ndvi: 0.41, stress: "Critical" },
 ]
 
+// Helper function to convert prediction values to colors
+const getColorForPrediction = (value: number): string => {
+  // Define colors for different prediction classes
+  const colors = [
+    '#22c55e', // Healthy - Green
+    '#84cc16', // Slightly Stressed - Light Green
+    '#eab308', // Moderately Stressed - Yellow
+    '#f97316', // Highly Stressed - Orange
+    '#ef4444'  // Critical - Red
+  ]
+  
+  // Ensure the value is within bounds
+  const index = Math.min(Math.max(0, value), colors.length - 1)
+  return colors[index]
+}
+
 const HealthMap = () => {
   const [selectedField, setSelectedField] = useState<typeof fieldData[0] | null>(null)
   const [showLabels, setShowLabels] = useState(true)
@@ -52,114 +77,163 @@ const HealthMap = () => {
   const [zoom, setZoom] = useState(5)
   const [rotation, setRotation] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  
+  // Use real-time prediction map data from socket
+  const { data: predictionData, isConnected } = usePredictionMap()
+  
+  // Use API data for prediction map
+  const { data: apiData, isLoading: isApiLoading, error: apiError } = useApiData()
+  
+  // Combined prediction data (prefer socket data, fallback to API data)
+  const [combinedPredictionData, setCombinedPredictionData] = useState<any>(null)
+  
+  // Log API data when it's loaded
+  useEffect(() => {
+    if (apiData) {
+      console.log('API data loaded for HealthMap:', apiData);
+    }
+    if (apiError) {
+      console.error('API error in HealthMap:', apiError);
+    }
+  }, [apiData, apiError])
+  
+  // Combine prediction data from socket and API
+  useEffect(() => {
+    if (predictionData) {
+      setCombinedPredictionData(predictionData);
+    } else if (apiData) {
+      setCombinedPredictionData(apiData);
+    }
+  }, [predictionData, apiData])
 
   // Generate heatmap visualization
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    const width = canvas.width = 800
-    const height = canvas.height = 600
+    const width = canvas.width = 800;
+    const height = canvas.height = 600;
 
     // Clear canvas
-    ctx.fillStyle = '#1a1a1a'
-    ctx.fillRect(0, 0, width, height)
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, width, height);
 
     // Draw grid background
-    ctx.strokeStyle = '#333'
-    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.5;
     for (let i = 0; i <= width; i += 40) {
-      ctx.beginPath()
-      ctx.moveTo(i, 0)
-      ctx.lineTo(i, height)
-      ctx.stroke()
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
     }
     for (let i = 0; i <= height; i += 40) {
-      ctx.beginPath()
-      ctx.moveTo(0, i)
-      ctx.lineTo(width, i)
-      ctx.stroke()
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
     }
 
     // Generate health heatmap
-    const imageData = ctx.createImageData(width, height)
-    const data = imageData.data
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
 
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const index = (y * width + x) * 4
-
-        // Calculate distance-based health from field centers
-        let maxHealth = 0
-        fieldData.forEach(field => {
-          const dx = x - (field.coords[0] + 100)
-          const dy = y - (field.coords[1] + 100)
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          const influence = Math.max(0, 1 - distance / 100)
-          maxHealth = Math.max(maxHealth, field.health * influence)
-        })
-
-        // Convert health to color
-        const normalizedHealth = maxHealth / 100
-        if (normalizedHealth > 0.8) {
-          data[index] = 34      // Green (healthy)
-          data[index + 1] = 197
-          data[index + 2] = 94
-        } else if (normalizedHealth > 0.6) {
-          data[index] = 132     // Yellow-green
-          data[index + 1] = 204
-          data[index + 2] = 22
-        } else if (normalizedHealth > 0.4) {
-          data[index] = 234     // Yellow
-          data[index + 1] = 179
-          data[index + 2] = 8
-        } else if (normalizedHealth > 0.2) {
-          data[index] = 249     // Orange
-          data[index + 1] = 115
-          data[index + 2] = 22
-        } else {
-          data[index] = 239     // Red (unhealthy)
-          data[index + 1] = 68
-          data[index + 2] = 68
+    // Check if we have prediction data (from either socket or API)
+     if (combinedPredictionData && combinedPredictionData.prediction_map && combinedPredictionData.prediction_map.length > 0) {
+       // Determine the dimensions of the prediction map (assuming it's square)
+       const mapSize = Math.sqrt(combinedPredictionData.prediction_map.length);
+      const cellWidth = width / mapSize;
+      const cellHeight = height / mapSize;
+      
+      // Draw the prediction map
+      for (let x = 0; x < mapSize; x++) {
+        for (let y = 0; y < mapSize; y++) {
+          const predictionValue = combinedPredictionData.prediction_map[y * mapSize + x];
+          const color = getColorForPrediction(predictionValue);
+          
+          // Fill the cell with the appropriate color
+          ctx.fillStyle = color;
+          ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
         }
-        data[index + 3] = Math.floor(normalizedHealth * 128 + 32) // Alpha
+      }
+    } else {
+      // Fallback to the original visualization if no prediction data
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+          const index = (y * width + x) * 4;
+
+          // Calculate distance-based health from field centers
+          let maxHealth = 0;
+          fieldData.forEach(field => {
+            const dx = x - (field.coords[0] + 100);
+            const dy = y - (field.coords[1] + 100);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const influence = Math.max(0, 1 - distance / 100);
+            maxHealth = Math.max(maxHealth, field.health * influence);
+          });
+
+          // Convert health to color
+          const normalizedHealth = maxHealth / 100;
+          if (normalizedHealth > 0.8) {
+            data[index] = 34;      // Green (healthy)
+            data[index + 1] = 197;
+            data[index + 2] = 94;
+          } else if (normalizedHealth > 0.6) {
+            data[index] = 132;     // Yellow-green
+            data[index + 1] = 204;
+            data[index + 2] = 22;
+          } else if (normalizedHealth > 0.4) {
+            data[index] = 234;     // Yellow
+            data[index + 1] = 179;
+            data[index + 2] = 8;
+          } else if (normalizedHealth > 0.2) {
+            data[index] = 249;     // Orange
+            data[index + 1] = 115;
+            data[index + 2] = 22;
+          } else {
+            data[index] = 239;     // Red (unhealthy)
+            data[index + 1] = 68;
+            data[index + 2] = 68;
+          }
+          data[index + 3] = Math.floor(normalizedHealth * 128 + 32); // Alpha
+        }
       }
     }
 
-    ctx.putImageData(imageData, 0, 0)
+    ctx.putImageData(imageData, 0, 0);
 
     // Draw field boundaries and labels
     fieldData.forEach(field => {
       if (field.health >= healthFilter[0] && field.health <= healthFilter[1]) {
-        const x = field.coords[0] + 100
-        const y = field.coords[1] + 100
+        const x = field.coords[0] + 100;
+        const y = field.coords[1] + 100;
 
         // Draw field boundary
-        ctx.strokeStyle = field.color
-        ctx.lineWidth = 2
-        ctx.strokeRect(x - 40, y - 30, 80, 60)
+        ctx.strokeStyle = field.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - 40, y - 30, 80, 60);
 
         // Draw field marker
-        ctx.fillStyle = field.color
-        ctx.beginPath()
-        ctx.arc(x, y, 8, 0, 2 * Math.PI)
-        ctx.fill()
+        ctx.fillStyle = field.color;
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, 2 * Math.PI);
+        ctx.fill();
 
         // Draw labels if enabled
         if (showLabels) {
-          ctx.fillStyle = '#ffffff'
-          ctx.font = '12px sans-serif'
-          ctx.textAlign = 'center'
-          ctx.fillText(field.name, x, y - 40)
-          ctx.fillText(`${field.health}%`, x, y + 50)
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(field.name, x, y - 40);
+          ctx.fillText(`${field.health}%`, x, y + 50);
         }
       }
-    })
+    });
 
-  }, [zoom, showLabels, healthFilter])
+  }, [zoom, showLabels, healthFilter, combinedPredictionData]);
 
   const getHealthColor = (health: number) => {
     if (health >= 85) return 'text-health-excellent'
@@ -178,45 +252,46 @@ const HealthMap = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8 w-full max-w-full">
       <Breadcrumbs />
       
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between"
       >
         <div>
-          <h1 className="text-4xl font-bold text-gradient-primary mb-2">Interactive Health Map</h1>
-          <p className="text-lg text-muted-foreground">Real-time crop health visualization with zoom and pan capabilities</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gradient-primary mb-2">Interactive Health Map</h1>
+          <p className="text-base md:text-lg text-muted-foreground">Real-time crop health visualization with zoom and pan capabilities</p>
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex gap-2 mt-4 lg:mt-0"
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="flex gap-2 mt-4 lg:mt-0 flex-shrink-0"
         >
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export Map
           </Button>
-          <Button className="bg-gradient-primary">
+          <Button className="bg-gradient-primary shadow-glow">
             <Satellite className="w-4 h-4 mr-2" />
             Satellite View
           </Button>
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full">
         {/* Map Visualization */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-2 xl:col-span-3"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="lg:col-span-2 w-full h-full flex flex-col"
         >
-          <Card className="viz-container">
+          <Card className="viz-container p-4 relative h-full">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Map className="w-5 h-5 text-primary" />
@@ -251,10 +326,10 @@ const HealthMap = () => {
             </div>
 
             {/* Interactive Canvas Map */}
-            <div className="relative bg-muted/20 rounded-xl overflow-hidden">
+            <div className="relative bg-muted/20 rounded-xl overflow-hidden flex-1">
               <canvas
                 ref={canvasRef}
-                className="w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing"
+                className="w-full h-full min-h-[400px] cursor-grab active:cursor-grabbing"
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   const x = ((e.clientX - rect.left) / rect.width) * 800
@@ -296,9 +371,41 @@ const HealthMap = () => {
                 </div>
               </div>
 
-              {/* Coordinates */}
-              <div className="absolute top-4 right-4 bg-card/90 backdrop-blur rounded-lg px-3 py-2 text-sm">
-                Zoom: {zoom}%
+              {/* Coordinates and Connection Status */}
+              <div className="absolute top-4 right-4 bg-card/90 backdrop-blur rounded-lg px-3 py-2 text-sm space-y-1">
+                <div>Zoom: {zoom}%</div>
+                <div className="flex items-center gap-2">
+                  <span>Socket:</span>
+                  {isConnected ? (
+                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 text-xs py-0 h-5">
+                      <CheckCircle className="w-3 h-3 mr-1" /> Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 text-xs py-0 h-5">
+                      <AlertTriangle className="w-3 h-3 mr-1" /> Disconnected
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>API:</span>
+                  {isApiLoading ? (
+                    <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-xs py-0 h-5">
+                      <TrendingUp className="w-3 h-3 mr-1" /> Loading
+                    </Badge>
+                  ) : apiData ? (
+                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 text-xs py-0 h-5">
+                      <CheckCircle className="w-3 h-3 mr-1" /> Loaded
+                    </Badge>
+                  ) : apiError ? (
+                    <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 text-xs py-0 h-5">
+                      <AlertTriangle className="w-3 h-3 mr-1" /> Error
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-gray-500/10 text-gray-500 border-gray-500/20 text-xs py-0 h-5">
+                      Idle
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
           </Card>
@@ -308,8 +415,8 @@ const HealthMap = () => {
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-6"
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="space-y-4 sm:space-y-6 w-full"
         >
           {/* Map Controls */}
           <Card className="viz-container p-3 sm:p-4">
@@ -417,7 +524,7 @@ const HealthMap = () => {
           )}
 
           {/* Field List */}
-          <Card className="viz-container">
+          <Card className="viz-container p-3 sm:p-4 w-full">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary" />
               Field Overview

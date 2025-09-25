@@ -19,7 +19,7 @@ export function MainContentWrapper({ children }: MainContentWrapperProps) {
     >
       <Header />
       <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6">
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col max-w-7xl mx-auto">
           {children}
         </div>
       </main>
