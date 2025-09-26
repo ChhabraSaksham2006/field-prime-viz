@@ -53,20 +53,22 @@ const fieldData = [
   { id: 5, name: "West Field E", health: 38, area: "19.5 ha", coords: [50, 200], color: "#ef4444", moisture: 30, temperature: 33, ndvi: 0.41, stress: "Critical" },
 ]
 
-// Helper function to convert prediction values to colors
-const getColorForPrediction = (value: number): string => {
-  // Define colors for different prediction classes
-  const colors = [
-    '#22c55e', // Healthy - Green
-    '#84cc16', // Slightly Stressed - Light Green
-    '#eab308', // Moderately Stressed - Yellow
-    '#f97316', // Highly Stressed - Orange
-    '#ef4444'  // Critical - Red
-  ]
+// Helper function to convert crop type IDs to health colors
+const getColorForPrediction = (cropTypeId: number): string => {
+  // Map crop types to health levels based on typical agricultural knowledge
+  // Lower IDs generally represent healthier crops, higher IDs represent stressed crops
   
-  // Ensure the value is within bounds
-  const index = Math.min(Math.max(0, value), colors.length - 1)
-  return colors[index]
+  if (cropTypeId <= 4) {
+    return '#22c55e'; // Healthy - Green (classes 1-4)
+  } else if (cropTypeId <= 8) {
+    return '#84cc16'; // Slightly Stressed - Light Green (classes 5-8)
+  } else if (cropTypeId <= 12) {
+    return '#eab308'; // Moderately Stressed - Yellow (classes 9-12)
+  } else if (cropTypeId <= 15) {
+    return '#f97316'; // Highly Stressed - Orange (classes 13-15)
+  } else {
+    return '#ef4444'; // Critical - Red (class 16)
+  }
 }
 
 const HealthMap = () => {
@@ -79,7 +81,7 @@ const HealthMap = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   
   // Use real-time prediction map data from socket
-  const { data: predictionData, isConnected } = usePredictionMap()
+  const { data: predictionData } = usePredictionMap()
   
   // Use API data for prediction map
   const { data: apiData, isLoading: isApiLoading, error: apiError } = useApiData()
@@ -142,9 +144,9 @@ const HealthMap = () => {
     const data = imageData.data;
 
     // Check if we have prediction data (from either socket or API)
-     if (combinedPredictionData && combinedPredictionData.prediction_map && combinedPredictionData.prediction_map.length > 0) {
-       // Determine the dimensions of the prediction map (assuming it's square)
-       const mapSize = Math.sqrt(combinedPredictionData.prediction_map.length);
+    if (combinedPredictionData && combinedPredictionData.prediction_map && combinedPredictionData.prediction_map.length > 0) {
+      // Determine the dimensions of the prediction map (assuming it's square)
+      const mapSize = Math.sqrt(combinedPredictionData.prediction_map.length);
       const cellWidth = width / mapSize;
       const cellHeight = height / mapSize;
       
@@ -161,6 +163,9 @@ const HealthMap = () => {
       }
     } else {
       // Fallback to the original visualization if no prediction data
+      const imageData = ctx.createImageData(width, height);
+      const data = imageData.data;
+      
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
           const index = (y * width + x) * 4;
@@ -201,9 +206,9 @@ const HealthMap = () => {
           data[index + 3] = Math.floor(normalizedHealth * 128 + 32); // Alpha
         }
       }
+      
+      ctx.putImageData(imageData, 0, 0);
     }
-
-    ctx.putImageData(imageData, 0, 0);
 
     // Draw field boundaries and labels
     fieldData.forEach(field => {
@@ -371,21 +376,9 @@ const HealthMap = () => {
                 </div>
               </div>
 
-              {/* Coordinates and Connection Status */}
+              {/* Coordinates and API Status */}
               <div className="absolute top-4 right-4 bg-card/90 backdrop-blur rounded-lg px-3 py-2 text-sm space-y-1">
                 <div>Zoom: {zoom}%</div>
-                <div className="flex items-center gap-2">
-                  <span>Socket:</span>
-                  {isConnected ? (
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 text-xs py-0 h-5">
-                      <CheckCircle className="w-3 h-3 mr-1" /> Connected
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 text-xs py-0 h-5">
-                      <AlertTriangle className="w-3 h-3 mr-1" /> Disconnected
-                    </Badge>
-                  )}
-                </div>
                 <div className="flex items-center gap-2">
                   <span>API:</span>
                   {isApiLoading ? (
