@@ -4,11 +4,24 @@ class SocketService {
   private socket: Socket | null = null;
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private _isConnected: boolean = false;
+  private url: string;
+
+  constructor() {
+    console.log('SocketService constructor called');
+    this.url = 'http://127.0.0.1:5000';
+    console.log('SocketService initialized with URL:', this.url);
+  }
 
   // Initialize the socket connection
   connect() {
-    if (this.socket) return;
+    console.log('SocketService.connect() called');
+    if (this.socket) {
+      console.log('Socket already exists, skipping connect');
+      return;
+    }
 
+    console.log('Attempting to connect to Socket.IO server at http://127.0.0.1:5000');
+    
     // Connect to the backend server
     this.socket = io('http://127.0.0.1:5000', {
       transports: ['websocket', 'polling'], // Add polling as fallback
@@ -18,15 +31,29 @@ class SocketService {
       timeout: 10000, // Increase timeout
     });
 
+    console.log('Socket.IO instance created:', this.socket);
+    console.log('Socket ID:', this.socket.id);
+    console.log('Socket connected status:', this.socket.connected);
+
     // Setup event listeners
+    console.log('Setting up socket event listeners...');
     this.socket.on('connect', () => {
-      console.log('Socket connected');
+      console.log('Socket connected successfully');
       this._isConnected = true;
       // Request initial data when connected
       console.log('Emitting request_initial_data event');
       this.socket.emit('request_initial_data');
       // Notify listeners about connection
       this.notifyListeners('connect', {});
+      console.log('Notified all connect listeners');
+    });
+
+    this.socket.on('connecting', () => {
+      console.log('Socket is connecting...');
+    });
+
+    this.socket.on('reconnect_attempt', (attemptNumber) => {
+      console.log(`Socket reconnection attempt ${attemptNumber}`);
     });
 
     this.socket.on('disconnect', () => {
@@ -36,6 +63,7 @@ class SocketService {
 
     this.socket.on('connect_error', (error) => {
       console.error('Socket connection error:', error);
+      console.error('Connection error details:', error.message);
       this._isConnected = false;
       // Notify listeners about connection error
       this.notifyListeners('connection_error', { error: error.message });

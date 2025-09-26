@@ -9,14 +9,18 @@ export const useInitialData = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionType, setConnectionType] = useState<'socket' | 'api' | 'none'>('none');
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
+    console.log('useInitialData: Initializing socket connection...');
     // Connect to socket
     socketService.connect();
     
     // Update initial connection status
-    setIsConnected(socketService.isConnected());
+    const initialConnectionStatus = socketService.isConnected();
+    console.log('useInitialData: Initial connection status:', initialConnectionStatus);
+    setIsConnected(initialConnectionStatus);
     
     // Set up listeners for connection status changes
     const handleConnect = () => {
@@ -203,6 +207,22 @@ export const usePredictionMap = () => {
     // Connect to socket
     socketService.connect();
 
+    // Update initial connection status
+    setIsConnected(socketService.isConnected());
+
+    // Set up listeners for connection status changes
+    const handleConnect = () => {
+      if (isMounted) {
+        setIsConnected(true);
+      }
+    };
+
+    const handleDisconnect = () => {
+      if (isMounted) {
+        setIsConnected(false);
+      }
+    };
+
     // Set up listener for prediction updates
     const handlePredictionUpdate = (predictionData: any) => {
       if (isMounted) {
@@ -218,6 +238,7 @@ export const usePredictionMap = () => {
       console.warn('Socket connection error, falling back to API', errorData);
       if (isMounted) {
         setError(errorData.error);
+        setIsConnected(false);
         // Fallback to API
         fetchDataFromApi();
       }
@@ -245,6 +266,9 @@ export const usePredictionMap = () => {
       }
     };
 
+    // Add listeners for connection events
+    socketService.addListener('connect', handleConnect);
+    socketService.addListener('disconnect', handleDisconnect);
     socketService.addListener('prediction_update', handlePredictionUpdate);
     socketService.addListener('analysis_result', handlePredictionUpdate);
     socketService.addListener('connection_error', handleConnectionError);
@@ -265,14 +289,14 @@ export const usePredictionMap = () => {
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
+      socketService.removeListener('connect', handleConnect);
+      socketService.removeListener('disconnect', handleDisconnect);
       socketService.removeListener('prediction_update', handlePredictionUpdate);
       socketService.removeListener('analysis_result', handlePredictionUpdate);
       socketService.removeListener('connection_error', handleConnectionError);
       socketService.removeListener('socket_error', handleConnectionError);
-      socketService.removeListener('connect', handleConnect);
-      socketService.removeListener('disconnect', handleDisconnect);
     };
   }, []);
 
-  return { data, isLoading, error, connectionType };
+  return { data, isLoading, error, connectionType, isConnected };
 };

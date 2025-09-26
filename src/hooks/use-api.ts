@@ -22,7 +22,6 @@ export const useApiData = () => {
         
         // Load hyperspectral data
         const loadDataResponse = await apiService.loadData();
-        console.log('Data loaded successfully:', loadDataResponse);
         
         if (loadDataResponse.success) {
           try {

@@ -24,10 +24,28 @@ import FAQ from "./pages/help/FAQ";
 // AppHeader import removed as it's not needed
 import { AppSidebar } from "./components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header"; // <-- Make sure this exists
+import { useEffect } from "react";
+import socketService from "@/lib/socket-service";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    console.log('App component mounted - initializing socket service');
+    
+    // Try to connect on app load
+    console.log('Attempting to connect socket service...');
+    socketService.connect();
+    
+    // Check connection status after a delay
+    setTimeout(() => {
+      const isConnected = socketService.isConnected();
+      console.log('Socket connection status after 2 seconds:', isConnected);
+    }, 2000);
+    
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
@@ -93,6 +111,7 @@ const App = () => (
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

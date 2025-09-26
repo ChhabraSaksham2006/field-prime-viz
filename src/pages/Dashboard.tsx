@@ -8,7 +8,9 @@ import {
   TrendingUp,
   MapPin,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Download,
+  FileText
 } from "lucide-react"
 // TODO: Create and implement socket hooks
 // Temporary mock implementation until socket hooks are created
@@ -28,6 +30,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { useToast } from "@/hooks/use-toast"
+import apiService from "@/lib/api-service"
 import {
   LineChart,
   Line,
@@ -78,6 +82,9 @@ const Dashboard = () => {
   // State to store the combined data
   const [iotData, setIotData] = useState<any[]>([]);
   const [healthData, setHealthData] = useState<any[]>([]);
+  const { toast } = useToast();
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [isExportingData, setIsExportingData] = useState(false);
   
   // Log API data when it's loaded
   useEffect(() => {
@@ -91,6 +98,88 @@ const Dashboard = () => {
       setAnalysisStatus('error');
     }
   }, [apiData, apiError, isApiLoading]);
+
+  // Handle report generation
+  const handleGenerateReport = async () => {
+    setIsGeneratingReport(true);
+    try {
+      const response = await apiService.generateReport('pdf', true, true, true);
+      
+      if (response.success) {
+        if (response.format === 'pdf') {
+          // Create a blob from the text content for download
+          const blob = new Blob([response.report_content], { type: 'text/plain' });
+          apiService.downloadFile(blob, response.filename, 'text/plain');
+        } else if (response.format === 'json') {
+          // Create a blob from the JSON content for download
+          const jsonString = JSON.stringify(response.report, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          apiService.downloadFile(blob, `report_${Date.now()}.json`, 'application/json');
+        }
+        
+        toast({
+          title: 'Report Generated',
+          description: 'Your agricultural report has been generated successfully.',
+        });
+      } else {
+        toast({
+          title: 'Report Generation Failed',
+          description: response.message || 'Could not generate report.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Report generation error:', error);
+      toast({
+        title: 'Report Generation Error',
+        description: 'An error occurred while generating the report.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  // Handle data export
+  const handleExportData = async () => {
+    setIsExportingData(true);
+    try {
+      const response = await apiService.exportData('csv', ['iot', 'analysis']);
+      
+      if (response.success) {
+        if (response.format === 'csv') {
+          // Create a blob from the CSV content
+          const blob = new Blob([response.data], { type: 'text/csv' });
+          apiService.downloadFile(blob, response.filename, 'text/csv');
+        } else if (response.format === 'json') {
+          // Create a blob from the JSON content
+          const jsonString = JSON.stringify(response.data, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          apiService.downloadFile(blob, response.filename, 'application/json');
+        }
+        
+        toast({
+          title: 'Data Exported',
+          description: 'Your data has been exported successfully.',
+        });
+      } else {
+        toast({
+          title: 'Data Export Failed',
+          description: response.message || 'Could not export data.',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Data export error:', error);
+      toast({
+        title: 'Data Export Error',
+        description: 'An error occurred while exporting data.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsExportingData(false);
+    }
+  };
   
   // Update the data when real-time updates are received
   useEffect(() => {
@@ -264,15 +353,39 @@ const Dashboard = () => {
           <Button 
             className="bg-gradient-primary shadow-glow text-xs sm:text-sm"
             aria-label="Generate agricultural report"
+            onClick={handleGenerateReport}
+            disabled={isGeneratingReport || isApiLoading}
           >
-            Generate Report
+            {isGeneratingReport ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                Generating...
+              </>
+            ) : (
+              <>
+                <FileText className="w-4 h-4 mr-2" />
+                Generate Report
+              </>
+            )}
           </Button>
           <Button 
             variant="outline" 
             className="text-xs sm:text-sm"
             aria-label="Export dashboard data"
+            onClick={handleExportData}
+            disabled={isExportingData || isApiLoading}
           >
-            Export Data
+            {isExportingData ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent mr-2"></div>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" />
+                Export Data
+              </>
+            )}
           </Button>
         </motion.div>
       </motion.div>
