@@ -3,7 +3,7 @@ import scipy.io
 from PIL import Image
 import os
 
-def load_hyperspectral_data(data_folder_path: str):
+def load_indian_pines_dataset(data_folder_path):
     """
     Loads and preprocesses the Indian Pines hyperspectral dataset.
 
@@ -75,13 +75,15 @@ def create_rgb_visualization(hypercube: np.ndarray):
 if __name__ == '__main__':
     # Example of how to use the functions
     # Note: This assumes the 'data' folder is in the parent directory of 'modules'
-    try:
-        data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
-        hc, gt = load_hyperspectral_data(data_dir)
-        rgb_img = create_rgb_visualization(hc)
-        print(f"Hypercube shape: {hc.shape}")
-        print(f"Ground truth shape: {gt.shape}")
-        print(f"RGB image mode: {rgb_img.mode}")
-        # rgb_img.show() # Uncomment to display the image if running locally
-    except FileNotFoundError as e:
-        print(e)
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_folder = os.path.join(os.path.dirname(current_dir), 'data')
+    
+    hypercube, ground_truth = load_indian_pines_dataset(data_folder)
+    rgb_image = create_rgb_visualization(hypercube)
+    rgb_image.save('indian_pines_rgb_preview.png')
+    print(f"Hypercube shape: {hypercube.shape}")
+    print(f"Ground truth shape: {ground_truth.shape}")
+    print("RGB preview saved as 'indian_pines_rgb_preview.png'")
+    # Example of how to use the functions
+    # Note: This assumes the 'data' folder is in the parent directory of 'modules'
