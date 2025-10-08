@@ -8,14 +8,14 @@ class SocketService {
 
   constructor() {
     console.log('SocketService constructor called');
-    this.url = 'http://127.0.0.1:5001';
+    this.url = 'https://web-production-edf4d.up.railway.app';
     console.log('SocketService initialized with URL:', this.url);
   }
 
   // Initialize the socket connection
   connect() {
     console.log('SocketService.connect() called - Socket.IO is disabled, using REST API only');
-    console.log('REST API is available at http://127.0.0.1:5001');
+    console.log('REST API is available at https://web-production-edf4d.up.railway.app');
     
     // Prevent Socket.IO connection since we're using REST API
     // Keep the method for backward compatibility but don't actually connect
