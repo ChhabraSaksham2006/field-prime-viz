@@ -3,7 +3,7 @@ import scipy.io
 from PIL import Image
 import os
 
-def load_indian_pines_dataset(data_folder_path):
+def load_hyperspectral_data(data_folder_path):
     """
     Loads and preprocesses the Indian Pines hyperspectral dataset.
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data_folder = os.path.join(os.path.dirname(current_dir), 'data')
     
-    hypercube, ground_truth = load_indian_pines_dataset(data_folder)
+    hypercube, ground_truth = load_hyperspectral_data(data_folder)
     rgb_image = create_rgb_visualization(hypercube)
     rgb_image.save('indian_pines_rgb_preview.png')
     print(f"Hypercube shape: {hypercube.shape}")
