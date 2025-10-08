@@ -98,7 +98,8 @@ async def index():
         "endpoints": [
             {"path": "/api/load_data", "method": "GET", "description": "Load hyperspectral data"},
             {"path": "/api/run_analysis", "method": "GET", "description": "Run analysis on loaded data"},
-            {"path": "/api/get_spectral_signature", "method": "GET", "description": "Get spectral signature for a pixel"}
+            {"path": "/api/get_spectral_signature", "method": "GET", "description": "Get spectral signature for a pixel"},
+            {"path": "/api/get_healthmap", "method": "GET", "description": "Get vegetation health map"}
         ]
     }
 
@@ -155,6 +156,44 @@ async def api_get_spectral_signature(x: int, y: int):
         raise HTTPException(status_code=400, detail="Invalid pixel coordinates.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting spectral signature: {str(e)}")
+
+@app.get("/api/get_healthmap")
+async def api_get_healthmap(index_type: str = "ndvi"):
+    """
+    Generate a vegetation health map using the specified index type.
+    
+    Args:
+        index_type (str): Type of vegetation index to use (default: 'ndvi')
+        
+    Returns:
+        JSONResponse: Contains the health map image as base64 and summary statistics
+    """
+    if hypercube_data is None:
+        raise HTTPException(status_code=400, detail="Please load hyperspectral data first.")
+        
+    try:
+        from modules.data_handler import create_healthmap_visualization
+        
+        # Generate the health map
+        healthmap_b64, index_values = create_healthmap_visualization(hypercube_data, index_type)
+        
+        # Calculate some basic statistics
+        stats = {
+            "min": float(np.min(index_values)),
+            "max": float(np.max(index_values)),
+            "mean": float(np.mean(index_values)),
+            "median": float(np.median(index_values)),
+            "std": float(np.std(index_values))
+        }
+        
+        return {
+            "success": True, 
+            "healthmap_image": healthmap_b64,
+            "index_type": index_type,
+            "stats": stats
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating health map: {str(e)}")
 
 class ReportRequest(BaseModel):
     format: str = "pdf"
