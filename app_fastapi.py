@@ -39,7 +39,7 @@ app = FastAPI(title="Field Prime Viz API",
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://agritechpro.vercel.app", "http://localhost:3000", "http://localhost:5173"],
+    allow_origins=["https://agritechpro.vercel.app","https://vercel.com/saksham-chhabras-projects-aa49b93b/agritech-pro/GrQSuGwLPo2ieHRnv88wt25ifeJK","https://agritech-pro.vercel.app", "http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
