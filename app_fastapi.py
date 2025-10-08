@@ -39,7 +39,7 @@ app = FastAPI(title="Field Prime Viz API",
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "*").split(","),
+    allow_origins=["https://agritechpro.vercel.app", "http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,22 +87,20 @@ async def load_trained_model_on_startup():
         # Continue running the app even if model loading fails
 
 # --- Routes ---
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=JSONResponse)
 async def index():
-    # For simplicity, we'll return a basic HTML response
-    # In production, you'd want to serve your React app properly
-    return """
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>Field Prime Viz</title>
-            <meta http-equiv="refresh" content="0;url=http://localhost:8080" />
-        </head>
-        <body>
-            <p>Redirecting to frontend...</p>
-        </body>
-    </html>
-    """
+    """API root endpoint providing information about the API"""
+    return {
+        "name": "Field Prime Viz API",
+        "version": "1.0.0",
+        "description": "FastAPI backend for Field Prime Viz agricultural analytics",
+        "frontend": "https://agritechpro.vercel.app",
+        "endpoints": [
+            {"path": "/api/load_data", "method": "GET", "description": "Load hyperspectral data"},
+            {"path": "/api/run_analysis", "method": "GET", "description": "Run analysis on loaded data"},
+            {"path": "/api/get_spectral_signature", "method": "GET", "description": "Get spectral signature for a pixel"}
+        ]
+    }
 
 @app.get("/api/load_data")
 async def api_load_data():
@@ -300,7 +298,7 @@ async def signup(user: UserSignup):
         raise HTTPException(status_code=400, detail="Invalid user data")
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 5000))  # Changed default port to 5000 to match frontend configuration
     host = os.getenv("HOST", "0.0.0.0")
     reload = os.getenv("RELOAD", "False").lower() == "true"
     
