@@ -2,9 +2,6 @@ import numpy as np
 import scipy.io
 from PIL import Image
 import os
-import matplotlib.pyplot as plt
-import io
-import base64
 
 def load_hyperspectral_data(data_folder_path: str):
     """
@@ -75,69 +72,6 @@ def create_rgb_visualization(hypercube: np.ndarray):
     
     return Image.fromarray(rgb_image_8bit)
 
-def calculate_ndvi(hypercube: np.ndarray, nir_band: int = 50, red_band: int = 29):
-    """
-    Calculate Normalized Difference Vegetation Index (NDVI) from hyperspectral data.
-    
-    Args:
-        hypercube (np.ndarray): The hyperspectral data cube
-        nir_band (int): Index of the near-infrared band
-        red_band (int): Index of the red band
-        
-    Returns:
-        np.ndarray: NDVI values ranging from -1 to 1
-    """
-    # Extract NIR and Red bands
-    nir = hypercube[:, :, nir_band]
-    red = hypercube[:, :, red_band]
-    
-    # Calculate NDVI
-    # Add small epsilon to avoid division by zero
-    epsilon = 1e-10
-    ndvi = (nir - red) / (nir + red + epsilon)
-    
-    # Clip values to valid NDVI range [-1, 1]
-    ndvi = np.clip(ndvi, -1, 1)
-    
-    return ndvi
-
-def create_healthmap_visualization(hypercube: np.ndarray, index_type: str = 'ndvi'):
-    """
-    Creates a health map visualization from hyperspectral data.
-    
-    Args:
-        hypercube (np.ndarray): The hyperspectral data cube
-        index_type (str): Type of vegetation index to use ('ndvi', 'gndvi', etc.)
-        
-    Returns:
-        tuple: (base64_image, index_values)
-            - base64_image: Base64 encoded string of the health map image
-            - index_values: Raw index values for further analysis
-    """
-    if index_type.lower() == 'ndvi':
-        index_values = calculate_ndvi(hypercube)
-    else:
-        # Default to NDVI if index type not recognized
-        index_values = calculate_ndvi(hypercube)
-    
-    # Create a colormap visualization
-    plt.figure(figsize=(8, 8))
-    plt.imshow(index_values, cmap='RdYlGn', vmin=-1, vmax=1)
-    plt.colorbar(label='NDVI')
-    plt.title('Vegetation Health Map')
-    plt.axis('off')
-    
-    # Save the figure to a BytesIO object
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')
-    plt.close()
-    buf.seek(0)
-    
-    # Convert to base64 string
-    img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-    
-    return f"data:image/png;base64,{img_str}", index_values
-
 if __name__ == '__main__':
     # Example of how to use the functions
     # Note: This assumes the 'data' folder is in the parent directory of 'modules'
@@ -148,10 +82,6 @@ if __name__ == '__main__':
         print(f"Hypercube shape: {hc.shape}")
         print(f"Ground truth shape: {gt.shape}")
         print(f"RGB image mode: {rgb_img.mode}")
-        
-        # Test health map
-        healthmap_img, ndvi_values = create_healthmap_visualization(hc)
-        print(f"NDVI range: {np.min(ndvi_values)} to {np.max(ndvi_values)}")
         # rgb_img.show() # Uncomment to display the image if running locally
     except FileNotFoundError as e:
         print(e)
